@@ -33,7 +33,8 @@ function App() {
           {/* Columna: Votante */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
           <button
-            onClick={() => setTipoSeleccionado('votante')}
+            onClick={() => {setTipoSeleccionado('votante'); setMostrarVotantes(false); setMostrarCandidatos(false);}}
+            
             style={{
               backgroundColor: 'red',
               color: 'white',
@@ -66,7 +67,7 @@ function App() {
           {/* Columna: Candidato */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
           <button
-            onClick={() => setTipoSeleccionado('candidato')}
+            onClick={() => {setTipoSeleccionado('candidato'); setMostrarVotantes(false); setMostrarCandidatos(false);}}
             style={{
               backgroundColor: 'blue',
               color: 'white',
