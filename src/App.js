@@ -1,6 +1,8 @@
+import React from 'react';
 import { useState } from 'react';
 import FormularioCandidato from './FormularioCandidato';
 import FormularioVotante from './FormularioVotante';
+import FormularioOrganizacion from './FormularioOrganizacion';
 
 
 function App() {
@@ -9,11 +11,45 @@ function App() {
   const [votantes, setVotantes] = useState([]);
   const [mostrarVotantes, setMostrarVotantes] = useState(false);
   const [mostrarCandidatos, setMostrarCandidatos] = useState(false);
+  const [organizaciones, setorganizaciones] = useState([
+    {
+      nombre: 'Universidad Técnica Nacional',
+      tipo: 'Universidad Pública',
+      registroVotantes: 'manual'
+    },
+    {
+      nombre: 'Colegio Científico de Alajuela',
+      tipo: 'Colegio',
+      registroVotantes: 'automatica'
+    },
+    {
+      nombre: 'Centro Educativo La Esperanza',
+      tipo: 'Escuela Privada',
+      registroVotantes: 'manual'
+    }
+  ]);
+  const [mostrarorganizaciones, setMostrarorganizaciones] = useState(false);
+  const [modoCandidato, setModoCandidato] = useState(null); 
+  const [candidatoEditando, setCandidatoEditando] = useState(null);
+  const [esperandoConfirmacion, setEsperandoConfirmacion] = useState(null); 
+  const [inputPassword, setInputPassword] = useState('');
+
+
+
+
   
-  const registrarCandidato = (nuevo) => {
-    setCandidatos([...candidatos, nuevo]);
-    alert('Candidato registrado con éxito');
+  const registrarCandidato = (nuevoCandidato) => {
+    if (candidatoEditando !== null) {
+      const actualizados = [...candidatos];
+      actualizados[candidatoEditando.index] = nuevoCandidato;
+      setCandidatos(actualizados);
+    } else {
+      setCandidatos([...candidatos, nuevoCandidato]);
+    }
+
     setTipoSeleccionado(null);
+    setModoCandidato(null);
+    setCandidatoEditando(null);
   };
 
   const registrarVotante = (nuevoVotante) => {
@@ -21,6 +57,12 @@ function App() {
     alert('Votante registrado con éxito');
     setTipoSeleccionado(null);
   };
+
+  const registrarorganizacion = (nueva) => {
+    setorganizaciones([...organizaciones, nueva]);
+    alert('Organización registrada con éxito');
+    setTipoSeleccionado(null);
+  };  
   
   return (
     <div style={{ padding: '0rem', fontFamily: 'Bebas Neue',fontSize:"2.5rem", textAlign: 'center' }}>
@@ -64,40 +106,204 @@ function App() {
             {mostrarVotantes ? 'Ocultar Votantes' : 'Ver Votantes'}
           </button>
         </div>
-          {/* Columna: Candidato */}
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
-          <button
-            onClick={() => {setTipoSeleccionado('candidato'); setMostrarVotantes(false); setMostrarCandidatos(false);}}
-            style={{
-              backgroundColor: 'blue',
-              color: 'white',
-              padding: '9rem 5rem',
-              fontFamily: 'Bebas Neue',
-              fontSize: '4rem',
-              border: 'none',
-              borderRadius: '20px',
-              cursor: 'pointer'
-            }}
-          >
-            Candidato
-          </button>
-          <button
-        onClick={() => setMostrarCandidatos(!mostrarCandidatos)}
-        style={{
-          backgroundColor: '#fff',
-          color: 'blue',
-          border: '2px solid blue',
-          padding: '0.5rem 2rem',
-          fontFamily: 'Bebas Neue',
-          fontSize: '2rem',
-          borderRadius: '10px',
-          cursor: 'pointer'
-        }}
-      >
-        {mostrarCandidatos ? 'Ocultar Candidatos' : 'Ver Candidatos'}
-      </button>
-        </div>
-      </div>)} 
+          {/* COLUMNA CANDIDATO */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
+            <button
+              onClick={() => {
+                setMostrarCandidatos(false);
+                setMostrarVotantes(false);
+                setTipoSeleccionado(null);
+                setModoCandidato(prev => prev === 'menu' ? null : 'menu');
+                setEsperandoConfirmacion(null);
+                setInputPassword('');
+              }}
+              style={{
+                backgroundColor: 'blue',
+                color: 'white',
+                padding: '9rem 5rem',
+                fontFamily: 'Bebas Neue',
+                fontSize: '4rem',
+                border: 'none',
+                borderRadius: '20px',
+                cursor: 'pointer'
+              }}
+            >
+              Candidato
+            </button>
+
+            <button
+              onClick={() => setMostrarCandidatos(!mostrarCandidatos)}
+              style={{
+                backgroundColor: '#fff',
+                color: 'blue',
+                border: '2px solid blue',
+                padding: '0.5rem 2rem',
+                fontFamily: 'Bebas Neue',
+                fontSize: '2rem',
+                borderRadius: '10px',
+                cursor: 'pointer'
+              }}
+            >
+              {mostrarCandidatos ? 'Ocultar Candidatos' : 'Ver Candidatos'}
+            </button>
+
+            {modoCandidato === 'menu' && (
+              <div style={{ marginTop: '1rem', textAlign: 'center' }}>
+                <h2 style={{ fontFamily: 'Bebas Neue', fontSize: '2rem' }}>¿QUÉ DESEA HACER?</h2>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+                  <button
+                    onClick={() => {
+                      setTipoSeleccionado('candidato');
+                      setModoCandidato('nuevo');
+                      setCandidatoEditando(null);
+                    }}
+                    style={{
+                      fontFamily: 'Bebas Neue',
+                      fontSize: '1.6rem',
+                      padding: '0.7rem 2rem',
+                      border: '2px solid black',
+                      backgroundColor: 'white',
+                      cursor: 'pointer',
+                      borderRadius: '8px'
+                    }}
+                  >
+                    REGISTRAR NUEVO CANDIDATO
+                  </button>
+
+                  <button
+                    onClick={() => setModoCandidato('editar')}
+                    style={{
+                      fontFamily: 'Bebas Neue',
+                      fontSize: '1.6rem',
+                      padding: '0.7rem 2rem',
+                      border: '2px solid black',
+                      backgroundColor: 'white',
+                      cursor: 'pointer',
+                      borderRadius: '8px'
+                    }}
+                  >
+                    MODIFICAR CANDIDATO EXISTENTE
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {modoCandidato === 'editar' && (
+              <div style={{ marginTop: '1rem', textAlign: 'center' }}>
+                <h3 style={{ fontFamily: 'Bebas Neue', fontSize: '1.8rem' }}>
+                  SELECCIONE EL CANDIDATO QUE DESEA MODIFICAR:
+                </h3>
+                <ul style={{ listStyle: 'none', padding: 0 }}>
+                  {candidatos.map((c, i) => (
+                    <li key={i} style={{ marginBottom: '0.5rem' }}>
+                      <button
+                        onClick={() => {
+                          setEsperandoConfirmacion({ ...c, index: i });
+                          setInputPassword('');
+                        }}
+                        style={{
+                          fontFamily: 'Bebas Neue',
+                          fontSize: '1.3rem',
+                          padding: '0.5rem 1rem',
+                          borderRadius: '8px',
+                          border: '2px solid black',
+                          backgroundColor: 'white',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        {c.nombre} {c.apellido}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {esperandoConfirmacion && (
+              <div style={{ marginTop: '1rem', textAlign: 'center' }}>
+                <h4 style={{ fontFamily: 'Bebas Neue', fontSize: '1.5rem' }}>
+                  INGRESE LA CONTRASEÑA DE <br /> {esperandoConfirmacion.nombre} {esperandoConfirmacion.apellido}
+                </h4>
+                <input
+                  type="password"
+                  placeholder="Contraseña"
+                  value={inputPassword}
+                  onChange={(e) => setInputPassword(e.target.value)}
+                  style={{
+                    fontFamily: 'Bebas Neue',
+                    fontSize: '1.2rem',
+                    padding: '0.5rem',
+                    margin: '0.5rem',
+                    borderRadius: '6px'
+                  }}
+                />
+                <div>
+                  <button
+                    onClick={() => {
+                      if (inputPassword === esperandoConfirmacion.contraseña) {
+                        setCandidatoEditando(esperandoConfirmacion);
+                        setTipoSeleccionado('candidato');
+                        setModoCandidato('modificando');
+                        setEsperandoConfirmacion(null);
+                        setInputPassword('');
+                      } else {
+                        alert('Contraseña incorrecta');
+                      }
+                    }}
+                    style={{
+                      fontFamily: 'Bebas Neue',
+                      fontSize: '1.3rem',
+                      padding: '0.4rem 1.2rem',
+                      borderRadius: '6px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    CONFIRMAR
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        {/* Columna: Institución */}
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
+        <button
+          onClick={() => {
+            setTipoSeleccionado('organizacion');
+            setMostrarCandidatos(false);
+            setMostrarVotantes(false);
+            setMostrarorganizaciones(false);
+          }}
+          style={{
+            backgroundColor: 'green',
+            color: 'white',
+            padding: '9rem 4rem',
+            fontFamily: 'Bebas Neue',
+            fontSize: '4rem',
+            border: 'none',
+            borderRadius: '20px',
+            cursor: 'pointer'
+          }}
+        >
+          Organización
+        </button>
+        <button
+          onClick={() => setMostrarorganizaciones(!mostrarorganizaciones)}
+          style={{
+            backgroundColor: '#fff',
+            color: 'green',
+            border: '2px solid green',
+            padding: '0.5rem 2rem',
+            fontFamily: 'Bebas Neue',
+            fontSize: '2rem',
+            borderRadius: '10px',
+            cursor: 'pointer'
+          }}
+        >
+          {mostrarorganizaciones ? 'Ocultar organizaciones' : 'Ver organizaciones'}
+        </button>
+      </div>
+        
+            </div>)} 
 
    
 {mostrarVotantes && (
@@ -123,13 +329,47 @@ function App() {
   </div>
 )}
 
-  {tipoSeleccionado === 'candidato' && (
+{mostrarorganizaciones && (
+  <div style={{ marginTop: '2rem' }}>
+    <h2>Lista de organizaciones</h2>
+    <ul style={{ listStyle: 'none', padding: 0 }}>
+      {organizaciones.map((inst, i) => (
+        <li key={i}>{inst.nombre} - Registro: {inst.registroVotantes}</li>
+      ))}
+    </ul>
+  </div>
+)}
+
+
+{tipoSeleccionado === 'candidato' && (
   <FormularioCandidato
-    onRegistrar={registrarCandidato}
+    onRegistrar={(candidato) => {
+      if (candidatoEditando !== null) {
+        const nuevos = [...candidatos];
+        nuevos[candidatoEditando.index] = candidato;
+        setCandidatos(nuevos);
+      } else {
+        setCandidatos([...candidatos, candidato]);
+      }
+      alert('Información guardada correctamente');
+      setTipoSeleccionado(null);
+      setModoCandidato(null);
+      setCandidatoEditando(null);
+    }}
     candidatos={candidatos}
-    onCancelar={() => setTipoSeleccionado(null)}
+    candidatoEditando={candidatoEditando}
+    organizaciones={organizaciones}
+    onCancelar={() => {
+      setTipoSeleccionado(null);
+      setModoCandidato(null);
+      setCandidatoEditando(null);
+      setEsperandoConfirmacion(null);
+      setInputPassword('');
+    }}
   />
 )}
+
+
 
 {tipoSeleccionado === 'votante' && (
   <FormularioVotante
@@ -139,6 +379,16 @@ function App() {
     onCancelar={() => setTipoSeleccionado(null)}
   />
 )}
+
+{tipoSeleccionado === 'organizacion' && (
+  <FormularioOrganizacion
+    onRegistrar={registrarorganizacion}
+    organizaciones={organizaciones}
+    onCancelar={() => setTipoSeleccionado(null)}
+  />
+)}
+
+
 
     </div>
   );
