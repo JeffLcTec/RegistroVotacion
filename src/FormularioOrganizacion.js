@@ -42,11 +42,11 @@ export default function FormularioOrganizacion({ onRegistrar, organizaciones, on
 
   return (
     <form onSubmit={handleSubmit} style={{ textAlign: 'center', maxWidth: '600px', margin: 'auto' }}>
-      <h2>Formulario Institución</h2>
+      <h2>Formulario Organización</h2>
 
       <input
         name="nombre"
-        placeholder="Nombre de la institución"
+        placeholder="Nombre de la organización"
         value={formData.nombre}
         onChange={handleChange}
         style={inputStyle}
@@ -87,7 +87,7 @@ export default function FormularioOrganizacion({ onRegistrar, organizaciones, on
       </div>
 
       <button type="submit" style={{ fontFamily: 'Bebas Neue', fontSize: '25px', margin: '1rem', borderRadius: '7px' }}>
-        Registrar Institución
+        Registrar Organización
       </button>
 
       <button type="button" onClick={onCancelar} style={{ fontFamily: 'Bebas Neue', fontSize: '22px', borderRadius: '7px' }}>
