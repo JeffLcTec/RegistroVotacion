@@ -371,7 +371,7 @@ function App() {
     </ul>
   </div>
 )}
-{mostrarVotantesFinales && (
+{mostrarorganizaciones && mostrarVotantesFinales && (
   <div style={{ marginTop: '2rem' }}>
     <h2>Lista de Votantes Registrados de {organizacionSeleccionada} </h2>
     <ul style={{ listStyle: 'none', padding: 0 }}>
