@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import FormularioRegistrarVotantesOrg from './FormularioRegistrarVotantesOrg.js';
+
 
 export default function FormularioOrganizacion({ onRegistrar, organizaciones, onCancelar }) {
   const [formData, setFormData] = useState({
@@ -15,6 +17,16 @@ export default function FormularioOrganizacion({ onRegistrar, organizaciones, on
     marginBottom: '10px',
     borderRadius: '6px',
     border: '1px solid #ccc'
+  };
+  const [votantesOrg, setVotantes] = useState([]);
+  const [mostrarFormularioVotantes, setMostrarFormularioVotantes] = useState(false);
+
+  const [votantesFinales, setVotantesFinales] = useState([]);
+
+  const manejarRegistroVotantes = (votantes) => {
+    setVotantesFinales(votantes);
+    console.log('Votantes recibidos:', votantes); // podés almacenarlos, enviarlos al backend, etc.
+    alert('Votantes registrados con éxito');
   };
 
   const handleChange = (e) => {
@@ -35,9 +47,14 @@ export default function FormularioOrganizacion({ onRegistrar, organizaciones, on
       alert('Ya existe una organización registrada con ese nombre.');
       return;
     }
-
-    onRegistrar(formData);
+    // Mandamos toda la organización con sus votantes incluidos
+    const organizacionConVotantes = {
+      ...formData,
+      votantes: votantesFinales // <--- Aquí agregamos la lista de votantes a la organización
+    };
+    onRegistrar(organizacionConVotantes);
     setFormData({ nombre: '', tipo: '', registroVotantes: 'manual' });
+    setVotantesFinales([]); 
   };
 
   return (
@@ -82,9 +99,16 @@ export default function FormularioOrganizacion({ onRegistrar, organizaciones, on
             checked={formData.registroVotantes === 'automatica'}
             onChange={handleChange}
           />
-          Los votantes ya están registrados por la organización
+          La organización registra a los votantes manualmente
         </label>
+
       </div>
+      {formData.registroVotantes === 'automatica'  && (
+  <FormularioRegistrarVotantesOrg
+    onRegistrar={manejarRegistroVotantes}
+    onCancelar={() => setMostrarFormularioVotantes(false)}
+  />
+)}
 
       <button type="submit" style={{ fontFamily: 'Bebas Neue', fontSize: '25px', margin: '1rem', borderRadius: '7px' }}>
         Registrar Organización
@@ -95,4 +119,5 @@ export default function FormularioOrganizacion({ onRegistrar, organizaciones, on
       </button>
     </form>
   );
+  
 }

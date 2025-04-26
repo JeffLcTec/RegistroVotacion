@@ -11,11 +11,31 @@ function App() {
   const [votantes, setVotantes] = useState([]);
   const [mostrarVotantes, setMostrarVotantes] = useState(false);
   const [mostrarCandidatos, setMostrarCandidatos] = useState(false);
+  const [mostrarVotantesFinales,setMostrarVotantesFinales] = useState(false);
+  const [organizacionSeleccionada, setOrganizacionSeleccionada] = useState('');
+  const [votantesFinales, setVotantesFinales] = useState([
+  ]);
+  
   const [organizaciones, setorganizaciones] = useState([
     {
       nombre: 'Universidad Técnica Nacional',
       tipo: 'Universidad Pública',
-      registroVotantes: 'manual'
+      registroVotantes: 'manual',
+      votantes: [{
+        nombre: 'Juan Pérez',
+        cedula: '101110111',
+        codigo: '12345'
+      },
+      {
+        nombre: 'María López',
+        cedula: '101110112',
+        codigo: '12346'
+      },
+      {
+        nombre: 'Carlos Rodríguez',
+        cedula: '101110113',
+        codigo: '12347'
+      }]
     },
     {
       nombre: 'Colegio Científico de Alajuela',
@@ -334,10 +354,35 @@ function App() {
     <h2>Lista de organizaciones</h2>
     <ul style={{ listStyle: 'none', padding: 0 }}>
       {organizaciones.map((inst, i) => (
-        <li key={i}>{inst.nombre} - Registro: {inst.registroVotantes}</li>
+        <li key={i} style={{ marginBottom: '1rem' }}>
+          {inst.nombre} - Registro: {inst.registroVotantes}
+          <button 
+            style={{ marginLeft: '1rem', fontSize: '17px', borderRadius: '5px' }}
+            onClick={() => {
+              setVotantesFinales(inst.votantes || []); // Asumiendo que cada organización tiene una lista de votantes
+              setMostrarVotantesFinales(true);
+              setOrganizacionSeleccionada(inst.nombre);
+            }}
+          >
+            Ver Votantes Registrados
+          </button>
+        </li>
       ))}
     </ul>
   </div>
+)}
+{mostrarVotantesFinales && (
+  <div style={{ marginTop: '2rem' }}>
+    <h2>Lista de Votantes Registrados de {organizacionSeleccionada} </h2>
+    <ul style={{ listStyle: 'none', padding: 0 }}>
+      {votantesFinales.map((v, i) => (
+        <li key={i}>{v.nombre} {v.apellido} - Cédula: {v.cedula} - Codigo: {v.codigo} </li>
+        
+      ))}
+      
+    </ul>
+  </div>
+   
 )}
 
 
