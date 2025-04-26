@@ -3,6 +3,7 @@ import { useState } from 'react';
 import FormularioCandidato from './FormularioCandidato';
 import FormularioVotante from './FormularioVotante';
 import FormularioOrganizacion from './FormularioOrganizacion';
+/*$env:NODE_OPTIONS="--openssl-legacy-provider"*/
 
 
 function App() {
@@ -75,7 +76,7 @@ function App() {
           {/* Columna: Votante */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
           <button
-            onClick={() => {setTipoSeleccionado('votante'); setMostrarVotantes(false); setMostrarCandidatos(false);}}
+            onClick={() => {setTipoSeleccionado('votante'); setMostrarVotantes(false); setMostrarCandidatos(false); setMostrarorganizaciones(false);}}
             
             style={{
               backgroundColor: 'red',
@@ -112,6 +113,7 @@ function App() {
               onClick={() => {
                 setMostrarCandidatos(false);
                 setMostrarVotantes(false);
+                setMostrarorganizaciones(false);
                 setTipoSeleccionado(null);
                 setModoCandidato(prev => prev === 'menu' ? null : 'menu');
                 setEsperandoConfirmacion(null);

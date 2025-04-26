@@ -4,7 +4,8 @@ export default function FormularioOrganizacion({ onRegistrar, organizaciones, on
   const [formData, setFormData] = useState({
     nombre: '',
     tipo: '',
-    registroVotantes: 'manual' // 'manual' o 'automatica'
+    registroVotantes: 'manual', // 'manual' o 'automatica'
+    votantes: [] 
   });
 
   const inputStyle = {
@@ -38,6 +39,17 @@ export default function FormularioOrganizacion({ onRegistrar, organizaciones, on
 
     onRegistrar(formData);
     setFormData({ nombre: '', tipo: '', registroVotantes: 'manual' });
+  };
+
+  // Lógica para el registro de votantes
+  const registrarVotante = () => {
+    if (formData.registroVotantes === 'automatica') {
+      // Aquí puedes agregar la lógica de cómo se agregan los votantes automáticamente
+      alert("Votante registrado automáticamente a la organización");
+    } else {
+      // Para "manual", pedimos que se registre a mano
+      alert("Por favor, registra el votante manualmente");
+    }
   };
 
   return (
@@ -86,6 +98,18 @@ export default function FormularioOrganizacion({ onRegistrar, organizaciones, on
         </label>
       </div>
 
+      {/* Mostrar botón 'Registrar votante' solo si el registro es automático */}
+      {formData.registroVotantes === 'automatica' && (
+        <button
+          type="button"
+          onClick={registrarVotante}
+          style={{ fontFamily: 'Bebas Neue', fontSize: '18px', margin: '1rem', borderRadius: '7px' }}
+        >
+          Registrar Votante
+        </button>
+      )}
+
+      {/* Botón común para registrar la organización */}
       <button type="submit" style={{ fontFamily: 'Bebas Neue', fontSize: '25px', margin: '1rem', borderRadius: '7px' }}>
         Registrar Organización
       </button>
