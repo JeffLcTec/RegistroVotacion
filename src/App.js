@@ -307,7 +307,12 @@ function App() {
           Organización
         </button>
         <button
-          onClick={() => setMostrarorganizaciones(!mostrarorganizaciones)}
+          onClick={() => {setMostrarorganizaciones(!mostrarorganizaciones); 
+          if (!mostrarorganizaciones) {
+            // Si estamos ocultando las organizaciones, también ocultamos la lista de votantes finales
+            setMostrarVotantesFinales(false);
+          }
+        }}
           style={{
             backgroundColor: '#fff',
             color: 'green',
