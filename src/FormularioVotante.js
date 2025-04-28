@@ -91,19 +91,6 @@ export default function FormularioVotante({ onRegistrar, votantes, onCancelar, c
           Cancelar
         </button>
       </div>
-
-      <div style={{ marginTop: '2rem' }}>
-        <h3 style={{ fontFamily: 'Bebas Neue' }}>Candidatos Registrados</h3>
-        <ul style={{ listStyle: 'none', padding: 0 }}>
-          {candidatos.map((candidato, index) => (
-            <li key={index} style={{ marginBottom: '10px' }}>
-              <strong>{candidato.nombre} {candidato.apellido}</strong><br />
-              <em>{candidato.plan}</em><br />
-              <span>{candidato.ideas}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
     </form>
   );
 }
