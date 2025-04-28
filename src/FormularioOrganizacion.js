@@ -122,16 +122,7 @@ export default function FormularioOrganizacion({ onRegistrar, organizaciones, on
   />
 )}
 
-      {/* Mostrar botón 'Registrar votante' solo si el registro es automático */}
-      {formData.registroVotantes === 'automatica' && (
-        <button
-          type="button"
-          onClick={registrarVotante}
-          style={{ fontFamily: 'Bebas Neue', fontSize: '18px', margin: '1rem', borderRadius: '7px' }}
-        >
-          Registrar Votante
-        </button>
-      )}
+     
 
       {/* Botón común para registrar la organización */}
       <button type="submit" style={{ fontFamily: 'Bebas Neue', fontSize: '25px', margin: '1rem', borderRadius: '7px' }}>
