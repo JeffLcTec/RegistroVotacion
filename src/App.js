@@ -4,6 +4,8 @@ import FormularioCandidato from './FormularioCandidato';
 import FormularioVotante from './FormularioVotante';
 import FormularioOrganizacion from './FormularioOrganizacion';
 import EditarVotantesOrganizacion from './EditarVotantesOrganizacion';
+import FormularioProcesoVotacion from './FormularioProcesoVotacion';
+
 /*$env:NODE_OPTIONS="--openssl-legacy-provider"*/
 
 
@@ -78,6 +80,7 @@ function App() {
   ]);
   const [votantes, setVotantes] = useState([]);
   const [mostrarVotantes, setMostrarVotantes] = useState(false);
+  const [mostrarProcesos, setMostrarProcesos] = useState(false);
   const [mostrarCandidatos, setMostrarCandidatos] = useState(false);
   const [mostrarVotantesFinales,setMostrarVotantesFinales] = useState(false);
   const [organizacionSeleccionada, setOrganizacionSeleccionada] = useState('');
@@ -119,6 +122,7 @@ function App() {
   ]);
   const [mostrarorganizaciones, setMostrarorganizaciones] = useState(false);
   const [modoCandidato, setModoCandidato] = useState(null); 
+  const [modoProceso, setModoProceso] = useState(null);
   const [candidatoEditando, setCandidatoEditando] = useState(null);
   const [esperandoConfirmacion, setEsperandoConfirmacion] = useState(null); 
   const [inputPassword, setInputPassword] = useState('');
@@ -132,10 +136,35 @@ function App() {
   const [votos, setVotos] = useState([]); 
   const [votoRealizado, setVotoRealizado] = useState(false);
 
+  const [procesos, setProcesos] = useState([
+    {
+      nombre: 'Proceso de Elecciones 2025',
+      sector: 'Educación',
+      descripcion: 'Elecciones para elegir representantes estudiantiles.',
+    },
+    {
+      nombre: 'Proceso de Elecciones 2026',
+      sector: 'Salud',
+      descripcion: 'Elecciones para elegir representantes de salud.',
+    }
+  ]);
+  const [creandoProceso, setCreandoProceso] = useState(false);
+  
+// Función para crear proceso
+const crearProceso = (nuevo) => {
+  setProcesos([...procesos, nuevo]);
+  setCreandoProceso(false);
+  alert('Proceso de votación creado exitosamente');
+};
 
-
-
-
+const [campañas, setCampañas] = useState([
+  {
+    nombre: 'Directiva Tecnología 2025',
+    miembros: [
+      { puesto: 'Presidente', correo: 'usado1@x.com' },
+    ]
+  }
+]);
   
   const registrarCandidato = (nuevoCandidato) => {
     if (candidatoEditando !== null) {
@@ -165,15 +194,71 @@ function App() {
   
   return (
     
-    <div style={{ padding: '0rem', fontFamily: 'Bebas Neue',fontSize:"2.5rem", textAlign: 'center' }}>
+    <div style={{ padding: '0rem',display: "flex", flexDirection: 'column' , alignItems: 'center',fontFamily: 'Bebas Neue',fontSize:"2.5rem", textAlign: 'center',gap: '1rem'  }}>
       {!modoVotante && (
         <>
       <h1>Registro</h1>
-
+             {/* Columna: Proceso Votacion */}
+    
+             <button
+            onClick={() => {
+              setTipoSeleccionado('ProcesoVotacion')
+              setMostrarVotantes(false);
+              setMostrarCandidatos(false);
+              setMostrarProcesos(false);
+              setMostrarorganizaciones(false);
+              setModoCandidato(null);
+              setModoOrganizacion(null);
+              setModoVotante(null); 
+              setModoProceso(true);
+            }}             
+            style={{
+              backgroundColor: 'orange',
+              color: 'white',
+              padding: '2rem 1rem',
+              fontFamily: 'Bebas Neue',
+              fontSize: '2rem',
+              border: 'none',
+              borderRadius: '20px',
+              cursor: 'pointer'
+            }}
+          >
+            Proceso de Votacion
+          </button>
+          <button
+            onClick={() => setMostrarProcesos(!mostrarProcesos)}
+            style={{
+              backgroundColor: '#fff',
+              color: 'orange',
+              border: '2px solid orange',
+              padding: '0.5rem 2rem',
+              fontFamily: 'Bebas Neue',
+              fontSize: '1.5rem',
+              borderRadius: '10px',
+              cursor: 'pointer'
+            }}
+          >
+            {mostrarProcesos ? 'Ocultar Procesos' : 'Ver Procesos'}
+          </button>
+          {mostrarProcesos && (
+  <div style={{ marginTop: '1rem'}}>
+    <h2>Lista de Procesos de Votacion</h2>
+    <ul style={{ listStyle: 'none', fontSize: '2rem'  }}>
+  {procesos.map((p, i) => (
+        <li key={i}>{p.nombre} -Sector: {p.sector} - Descripción: {p.descripcion}</li>
+      ))}
+    </ul>
+  
+  </div>
+)}
 
       {!tipoSeleccionado && (
-        <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem', marginTop: '2rem' }}>
+        
 
+ 
+        
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem', marginTop: '2rem' }}>
+          
           {/* Columna: Votante */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
           <button
@@ -189,7 +274,7 @@ function App() {
             style={{
               backgroundColor: 'red',
               color: 'white',
-              padding: '9rem 6rem',
+              padding: '9rem 7rem',
               fontFamily: 'Bebas Neue',
               fontSize: '4rem',
               border: 'none',
@@ -215,6 +300,7 @@ function App() {
             {mostrarVotantes ? 'Ocultar Votantes' : 'Ver Votantes'}
           </button>
         </div>
+        
           {/* COLUMNA CANDIDATO */}
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
             <button
@@ -238,7 +324,7 @@ function App() {
                 cursor: 'pointer'
               }}
             >
-              Candidato
+              Candidato                         
             </button>
 
             <button
@@ -513,6 +599,8 @@ function App() {
   </div>
 )}
 
+
+
 {mostrarCandidatos && (
   <div style={{ marginTop: '2rem' }}>
     <h2>Lista de Candidatos</h2>
@@ -559,6 +647,8 @@ function App() {
   </div>
    
 )}
+
+
 
 {modoVotante && organizacionParaVotar && organizacionParaVotar.registroVotantes === 'manual' && (
   <FormularioVotante
@@ -703,11 +793,14 @@ function App() {
       } else {
         setCandidatos([...candidatos, candidato]);
       }
+      
       alert('Información guardada correctamente');
       setTipoSeleccionado(null);
       setModoCandidato(null);
       setCandidatoEditando(null);
     }}
+    campañas={campañas}
+    setCampañas={setCampañas}
     candidatos={candidatos}
     candidatoEditando={candidatoEditando}
     organizaciones={organizaciones}
@@ -721,6 +814,21 @@ function App() {
   />
 )}
 
+{tipoSeleccionado === 'ProcesoVotacion' && (
+  <FormularioProcesoVotacion
+    organizaciones={organizaciones}
+    onCrear={(nuevoProceso) => {
+      setProcesos([...procesos, nuevoProceso]);
+      alert('Proceso creado exitosamente');
+      setTipoSeleccionado(null);
+      setModoProceso(false);
+    }}
+    onCancelar={() => {
+      setTipoSeleccionado(null);
+      setModoProceso(false);
+    }}
+  />
+)}
 
 
 {tipoSeleccionado === 'votante' && (

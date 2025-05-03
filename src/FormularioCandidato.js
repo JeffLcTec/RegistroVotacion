@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 
+
 export default function FormularioCandidato({
   onRegistrar,
   candidatos,
   onCancelar,
   candidatoEditando,
-  organizaciones
+  organizaciones,
+  campañas,
+  setCampañas
 }) {
   const [formData, setFormData] = useState(candidatoEditando || {
     nombre: '',
@@ -15,8 +18,18 @@ export default function FormularioCandidato({
     plan: '',
     ideas: '',
     organizacion: '',
+    campaña: '',
+    puesto: '',
     archivosAdjuntos: []
   });
+
+
+  const [modoCampaña, setModoCampaña] = useState(null);
+  const [campañaSeleccionada, setCampañaSeleccionada] = useState('');
+  const [puesto, setPuesto] = useState('');
+  
+  
+  
 
   const inputStyle = {
     fontFamily: 'Bebas Neue',
@@ -50,13 +63,23 @@ export default function FormularioCandidato({
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    const camposObligatorios = ['nombre', 'apellido', 'correo', 'contraseña', 'plan', 'ideas', 'organizacion'];
+    const camposObligatorios = ['nombre', 'apellido', 'correo', 'contraseña','organizacion'];
     const algunoVacio = camposObligatorios.some((campo) => formData[campo].trim() === '');
+
     if (algunoVacio) {
       alert('Por favor complete todos los campos.');
       return;
     }
+    if (modoCampaña === 'existente' && (!campañaSeleccionada || !puesto)) {
+      alert('Debe seleccionar una campaña y un puesto.');
+      return;
+
+    }
+    if (modoCampaña === 'nueva' && !formData.campaña.trim()) {
+      alert('Debe indicar el nombre de la nueva campaña.');
+      return;
+    }
+
 
     const existe = candidatos.some((c, index) =>
       c.correo === formData.correo &&
@@ -67,7 +90,48 @@ export default function FormularioCandidato({
       return;
     }
 
-    onRegistrar(formData);
+    if (modoCampaña === 'existente') {
+      const actualizadas = campañas.map((campaña) => {
+        if (campaña.nombre === campañaSeleccionada) {
+          return {
+            ...campaña,
+            miembros: [...campaña.miembros, { puesto, correo: formData.correo }]
+          };
+        }
+        return campaña;
+      });
+      setCampañas(actualizadas);
+    }
+    
+    if (modoCampaña === 'nueva') {
+      const yaExiste = campañas.some(c => c.nombre === formData.campaña);
+      if (!yaExiste) {
+        setCampañas([
+          ...campañas,
+          {
+            nombre: formData.campaña,
+            miembros: [{ puesto: puesto, correo: formData.correo }]
+          }
+        ]);
+      } else {
+        setCampañas(campañas.map(c => {
+          if (c.nombre === formData.campaña) {
+            return {
+              ...c,
+              miembros: [...c.miembros, { puesto: puesto, correo: formData.correo }]
+            };
+          }
+          return c;
+        }));
+      }
+    }
+    const finalFormData = {
+      ...formData,
+      campaña: modoCampaña === 'nueva' ? formData.campaña : campañaSeleccionada,
+      puesto: modoCampaña === 'nueva' ? puesto : puesto
+    };
+
+    onRegistrar(finalFormData);
 
     setFormData({
       nombre: '',
@@ -77,8 +141,13 @@ export default function FormularioCandidato({
       plan: '',
       ideas: '',
       organizacion: '',
+      campaña: '',
+      puesto: '',
       archivosAdjuntos: []
     });
+    setModoCampaña(null);
+    setCampañaSeleccionada('');
+    setPuesto('');
   };
 
   return (
@@ -105,72 +174,129 @@ export default function FormularioCandidato({
         ))}
       </select>
 
-      <input name="plan" placeholder="Plan de campaña" value={formData.plan} onChange={handleChange} style={inputStyle} />
-      <textarea
-        name="ideas"
-        placeholder="Ideas de campaña"
-        value={formData.ideas}
-        onChange={handleChange}
-        rows={4}
-        style={{
-          width: '100%',
-          padding: '12px',
-          fontFamily: 'Bebas Neue',
-          fontSize: '1.3rem',
-          marginTop: '1rem',
-          marginBottom: '0px',
-          borderRadius: '7px',
-          border: '1px solid #ccc',
-          resize: 'vertical'
-        }}
-      />
-
-      <input
-        type="file"
-        accept="image/*,application/pdf,video/*"
-        multiple
-        onChange={handleFileChange}
-        style={inputStyle}
-      />
-
-      {formData.archivosAdjuntos.length > 0 && (
-        <div style={{ marginTop: '1rem' }}>
-          <h3>Archivos adjuntos:</h3>
-          {formData.archivosAdjuntos.map((file, i) => (
-            <div key={i} style={{ marginBottom: '1.5rem' }}>
-              <p><strong>{file.nombre}</strong></p>
-              {file.tipo.startsWith('image/') && (
-                <img src={file.url} alt={file.nombre} style={{ maxWidth: '100%', borderRadius: '6px' }} />
-              )}
-              {file.tipo === 'application/pdf' && (
-                <a href={file.url} target="_blank" rel="noreferrer">📄 Ver PDF</a>
-              )}
-              {file.tipo.startsWith('video/') && (
-                <video controls width="100%">
-                  <source src={file.url} type={file.tipo} />
-                </video>
-              )}
-              <button
-                type="button"
-                onClick={() => eliminarArchivo(file.nombre)}
-                style={{
-                  fontFamily: 'Bebas Neue',
-                  fontSize: '18px',
-                  marginTop: '0.5rem',
-                  backgroundColor: 'red',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '5px',
-                  padding: '6px 12px',
-                  cursor: 'pointer'
-                }}
-              >
-                Eliminar archivo
-              </button>
+      {/* NUEVO: Selección de campaña */}
+      <div style={{ marginBottom: '1rem' }}>
+              <h3>¿Desea crear o unirse a una campaña?</h3>
+              <button type="button" onClick={() => setModoCampaña('nueva')} style={{ marginRight: '1rem' }}>Crear nueva</button>
+              <button type="button" onClick={() => setModoCampaña('existente')}>Unirse a una existente</button>
             </div>
-          ))}
-        </div>
-      )}
+
+            {modoCampaña === 'nueva' && (
+            
+              <>
+                <input
+                  name="campaña"
+                  placeholder="Nombre de la nueva campaña"
+                  value={formData.campaña}
+                  onChange={handleChange}
+                  style={inputStyle}
+                />
+                <select value={puesto} onChange={(e) => setPuesto(e.target.value)} style={inputStyle}>
+                  <option value="">Seleccione su puesto</option>
+                  {['Presidente', 'Vicepresidente', 'Tesorero', 'Secretario'].map((p, i) => (
+                    <option key={i} value={p}>{p}</option>
+                  ))}
+                </select>
+
+          <input name="plan" placeholder="Plan de campaña" value={formData.plan} onChange={handleChange} style={inputStyle} />
+          <textarea
+            name="ideas"
+            placeholder="Ideas de campaña"
+            value={formData.ideas}
+            onChange={handleChange}
+            rows={4}
+            style={{
+              width: '100%',
+              padding: '12px',
+              fontFamily: 'Bebas Neue',
+              fontSize: '1.3rem',
+              marginTop: '1rem',
+              marginBottom: '0px',
+              borderRadius: '7px',
+              border: '1px solid #ccc',
+              resize: 'vertical'
+            }}
+          />
+
+          <input
+            type="file"
+            accept="image/*,application/pdf,video/*"
+            multiple
+            onChange={handleFileChange}
+            style={inputStyle}
+          />
+
+          {formData.archivosAdjuntos.length > 0 && (
+            <div style={{ marginTop: '1rem' }}>
+              <h3>Archivos adjuntos:</h3>
+              {formData.archivosAdjuntos.map((file, i) => (
+                <div key={i} style={{ marginBottom: '1.5rem' }}>
+                  <p><strong>{file.nombre}</strong></p>
+                  {file.tipo.startsWith('image/') && (
+                    <img src={file.url} alt={file.nombre} style={{ maxWidth: '100%', borderRadius: '6px' }} />
+                  )}
+                  {file.tipo === 'application/pdf' && (
+                    <a href={file.url} target="_blank" rel="noreferrer">📄 Ver PDF</a>
+                  )}
+                  {file.tipo.startsWith('video/') && (
+                    <video controls width="100%">
+                      <source src={file.url} type={file.tipo} />
+                    </video>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => eliminarArchivo(file.nombre)}
+                    style={{
+                      fontFamily: 'Bebas Neue',
+                      fontSize: '18px',
+                      marginTop: '0.5rem',
+                      backgroundColor: 'red',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '5px',
+                      padding: '6px 12px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Eliminar archivo
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+                  </>
+            )}
+
+            {modoCampaña === 'existente' && (
+              <>
+                <select value={campañaSeleccionada} onChange={(e) => setCampañaSeleccionada(e.target.value)} style={inputStyle}>
+                  <option value="">Seleccione campaña existente</option>
+                  {campañas.map((c, i) => (
+                    <option key={i} value={c.nombre}>{c.nombre}</option>
+                  ))}
+                </select>
+
+                {campañaSeleccionada && (
+                  <select value={puesto} onChange={(e) => setPuesto(e.target.value)} style={inputStyle}>
+                    <option value="">Seleccione su puesto</option>
+                    {['Presidente', 'Vicepresidente', 'Tesorero', 'Secretario'].map((p, i) => {
+                      const ocupada = campañas
+                        .find(c => c.nombre === campañaSeleccionada)
+                        ?.miembros.some(m => m.puesto === p);
+                      return (
+                        <option key={i} value={p} disabled={ocupada}>
+                          {p} {ocupada ? '(Ocupado)' : ''}
+                        </option>
+                      );
+                    })}
+                  </select>
+                )}
+                
+              </>
+              
+            )}
+
+      
 
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0px', marginTop: '1rem' }}>
         <button type="submit" style={{ fontFamily: 'Bebas Neue', fontSize: '30px', marginTop: '1rem', marginBottom: '2rem', borderRadius: '7px' }}>
