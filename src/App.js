@@ -5,6 +5,7 @@ import FormularioVotante from './FormularioVotante';
 import FormularioOrganizacion from './FormularioOrganizacion';
 import EditarVotantesOrganizacion from './EditarVotantesOrganizacion';
 import FormularioProcesoVotacion from './FormularioProcesoVotacion';
+import AdminPanel from './pages/AdminPanel';
 
 /*$env:NODE_OPTIONS="--openssl-legacy-provider"*/
 
@@ -191,7 +192,27 @@ const [campañas, setCampañas] = useState([
     alert('Organización registrada con éxito');
     setTipoSeleccionado(null);
   };  
-  
+
+  const [rol, setRol] = useState(null);
+
+if (!rol) {
+  return (
+    <div style={{ textAlign: 'center', marginTop: '5rem', fontFamily: 'Bebas Neue' }}>
+      <h1>Seleccione su rol</h1>
+      <button onClick={() => setRol('votante')}
+        style={{ margin: '1rem', padding: '1rem 2rem', fontSize: '2rem', backgroundColor: 'red', color: 'white', borderRadius: '10px', border: 'none' }}>
+        Votante
+      </button>
+      <button onClick={() => setRol('admin')}
+        style={{ margin: '1rem', padding: '1rem 2rem', fontSize: '2rem', backgroundColor: 'blue', color: 'white', borderRadius: '10px', border: 'none' }}>
+        Administrador
+      </button>
+    </div>
+  );
+}
+
+
+
   return (
     
     <div style={{ padding: '0rem',display: "flex", flexDirection: 'column' , alignItems: 'center',fontFamily: 'Bebas Neue',fontSize:"2.5rem", textAlign: 'center',gap: '1rem'  }}>
