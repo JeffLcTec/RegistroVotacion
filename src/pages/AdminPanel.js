@@ -33,6 +33,7 @@ function AdminPanel({ organizaciones, setOrganizaciones, candidatos, setCandidat
     {
       nombre: 'Proceso de Elecciones 2025',
       sector: 'Educación',
+      organizacion: 'Universidad Técnica Nacional',
       descripcion: 'Elecciones para elegir representantes estudiantiles.',
     },
     {
@@ -55,7 +56,8 @@ const [campañas, setCampañas] = useState([
     nombre: 'Directiva Tecnología 2025',
     miembros: [
       { puesto: 'Presidente', correo: 'usado1@x.com' },
-    ]
+    ],
+    proceso: 'Proceso de Elecciones 2025',
   }
 ]);
   
@@ -528,7 +530,9 @@ const [campañas, setCampañas] = useState([
       setTipoSeleccionado(null);
       setModoCandidato(null);
       setCandidatoEditando(null);
-    }}
+    }
+  }
+    procesos={procesos}
     campañas={campañas}
     setCampañas={setCampañas}
     candidatos={candidatos}

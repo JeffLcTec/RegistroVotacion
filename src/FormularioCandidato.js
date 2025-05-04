@@ -7,6 +7,7 @@ export default function FormularioCandidato({
   onCancelar,
   candidatoEditando,
   organizaciones,
+  procesos,
   campañas,
   setCampañas
 }) {
@@ -18,6 +19,7 @@ export default function FormularioCandidato({
     plan: '',
     ideas: '',
     organizacion: '',
+    proceso: '',
     campaña: '',
     puesto: '',
     archivosAdjuntos: []
@@ -63,7 +65,7 @@ export default function FormularioCandidato({
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const camposObligatorios = ['nombre', 'apellido', 'correo', 'contraseña','organizacion'];
+    const camposObligatorios = ['nombre', 'apellido', 'correo', 'contraseña','organizacion', "proceso"];
     const algunoVacio = camposObligatorios.some((campo) => formData[campo].trim() === '');
 
     if (algunoVacio) {
@@ -110,6 +112,7 @@ export default function FormularioCandidato({
           ...campañas,
           {
             nombre: formData.campaña,
+            proceso: formData.proceso,
             miembros: [{ puesto: puesto, correo: formData.correo }]
           }
         ]);
@@ -174,6 +177,22 @@ export default function FormularioCandidato({
         ))}
       </select>
 
+      <select
+        name="proceso"
+        value={formData.proceso}
+        onChange={handleChange}
+        style={{ ...inputStyle, fontFamily: 'Bebas Neue' }}
+      >
+        <option value="">Seleccione un Proceso</option>
+        {procesos
+        .filter(p => p.organizacion === formData.organizacion) 
+        .map((p, i) => (
+          <option key={i} value={p.nombre}>
+            {p.nombre} ({p.organizacion} - {p.sector})
+          </option>
+        ))}
+      </select>
+
       {/* NUEVO: Selección de campaña */}
       <div style={{ marginBottom: '1rem' }}>
               <h3>¿Desea crear o unirse a una campaña?</h3>
@@ -191,6 +210,7 @@ export default function FormularioCandidato({
                   onChange={handleChange}
                   style={inputStyle}
                 />
+              
                 <select value={puesto} onChange={(e) => setPuesto(e.target.value)} style={inputStyle}>
                   <option value="">Seleccione su puesto</option>
                   {['Presidente', 'Vicepresidente', 'Tesorero', 'Secretario'].map((p, i) => (
@@ -271,7 +291,7 @@ export default function FormularioCandidato({
               <>
                 <select value={campañaSeleccionada} onChange={(e) => setCampañaSeleccionada(e.target.value)} style={inputStyle}>
                   <option value="">Seleccione campaña existente</option>
-                  {campañas.map((c, i) => (
+                  {campañas.filter(c => c.proceso === formData.proceso).map((c, i) => (
                     <option key={i} value={c.nombre}>{c.nombre}</option>
                   ))}
                 </select>
