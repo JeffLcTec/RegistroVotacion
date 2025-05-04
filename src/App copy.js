@@ -558,6 +558,10 @@ const [campañas, setCampañas] = useState([
   </div>
 )}
 
+
+
+
+
 {mostrarorganizaciones && (
   <div style={{ marginTop: '2rem' }}>
     <h2>Lista de organizaciones</h2>

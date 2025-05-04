@@ -484,6 +484,34 @@ const [campañas, setCampañas] = useState([
   </div>
 )}
 
+{mostrarProcesos && (
+  <div style={{ marginTop: '2rem', textAlign: 'center', fontFamily: 'Bebas Neue' }}>
+    <h2 style={{ fontSize: '2.2rem' }}>Lista de Procesos de Votación</h2>
+    {procesos.length === 0 ? (
+      <p style={{ fontSize: '1.5rem' }}>No hay procesos registrados aún.</p>
+    ) : (
+      <ul style={{ listStyle: 'none', padding: 0 }}>
+        {procesos.map((p, i) => (
+          <li key={i} style={{ 
+            marginBottom: '1rem', 
+            padding: '1rem', 
+            border: '1px solid #ccc', 
+            borderRadius: '10px', 
+            backgroundColor: '#f9f9f9',
+            maxWidth: '600px',
+            marginInline: 'auto'
+          }}>
+            <strong>{p.nombre}</strong><br />
+            Sector: {p.sector}<br />
+            Organización: {p.organizacion || 'No asignada'}<br />
+            {p.descripcion && <div>Descripción: {p.descripcion}</div>}
+          </li>
+        ))}
+      </ul>
+    )}
+  </div>
+)}
+
 
 {tipoSeleccionado === 'candidato' && (
   <FormularioCandidato
