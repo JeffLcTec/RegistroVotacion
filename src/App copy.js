@@ -1,23 +1,126 @@
 import React from 'react';
 import { useState } from 'react';
-import FormularioCandidato from '../FormularioCandidato';
-import FormularioVotante from '../FormularioVotante';
-import FormularioOrganizacion from '../FormularioOrganizacion';
-import EditarVotantesOrganizacion from '../EditarVotantesOrganizacion';
-import FormularioProcesoVotacion from '../FormularioProcesoVotacion';
+import FormularioCandidato from './FormularioCandidato';
+import FormularioVotante from './FormularioVotante';
+import FormularioOrganizacion from './FormularioOrganizacion';
+import EditarVotantesOrganizacion from './EditarVotantesOrganizacion';
+import FormularioProcesoVotacion from './FormularioProcesoVotacion';
 
 
 /*$env:NODE_OPTIONS="--openssl-legacy-provider"*/
 
 
-function AdminPanel({ organizaciones, setOrganizaciones, candidatos, setCandidatos, votantes, setVotantes }) {
+function App() {
   
   const [tipoSeleccionado, setTipoSeleccionado] = useState(null);
+  const [candidatos, setCandidatos] = useState([
+    // Universidad Técnica Nacional
+    {
+      nombre: 'Laura',
+      apellido: 'Jiménez',
+      correo: 'laura.jimenez@utn.ac.cr',
+      contraseña: 'laura123',
+      plan: 'Innovación educativa para el futuro.',
+      ideas: 'Fortalecer la investigación y los proyectos interdisciplinarios en la UTN.',
+      organizacion: 'Universidad Técnica Nacional',
+      archivosAdjuntos: []
+    },
+    {
+      nombre: 'Andrés',
+      apellido: 'Sánchez',
+      correo: 'andres.sanchez@utn.ac.cr',
+      contraseña: 'andres123',
+      plan: 'Universidad verde y sostenible.',
+      ideas: 'Implementar proyectos de energía limpia y huertas urbanas en todos los campus.',
+      organizacion: 'Universidad Técnica Nacional',
+      archivosAdjuntos: []
+    },
+  
+    // Colegio Científico de Alajuela
+    {
+      nombre: 'Valeria',
+      apellido: 'Castro',
+      correo: 'valeria.castro@cca.cr',
+      contraseña: 'valeria123',
+      plan: 'Más actividades deportivas y culturales.',
+      ideas: 'Crear nuevos clubes de arte y tecnología para los estudiantes.',
+      organizacion: 'Colegio Científico de Alajuela',
+      archivosAdjuntos: []
+    },
+    {
+      nombre: 'Diego',
+      apellido: 'Mora',
+      correo: 'diego.mora@cca.cr',
+      contraseña: 'diego123',
+      plan: 'Mejoras en infraestructura educativa.',
+      ideas: 'Modernizar los laboratorios de ciencias y tecnología.',
+      organizacion: 'Colegio Científico de Alajuela',
+      archivosAdjuntos: []
+    },
+  
+    // Centro Educativo La Esperanza
+    {
+      nombre: 'Fernanda',
+      apellido: 'Rojas',
+      correo: 'fernanda.rojas@laesperanza.cr',
+      contraseña: 'fernanda123',
+      plan: 'Educación inclusiva para todos.',
+      ideas: 'Desarrollar programas de tutorías para estudiantes con dificultades de aprendizaje.',
+      organizacion: 'Centro Educativo La Esperanza',
+      archivosAdjuntos: []
+    },
+    {
+      nombre: 'Gabriel',
+      apellido: 'Alpízar',
+      correo: 'gabriel.alpizar@laesperanza.cr',
+      contraseña: 'gabriel123',
+      plan: 'Tecnología para el aprendizaje.',
+      ideas: 'Implementar tablets y plataformas digitales en todas las clases.',
+      organizacion: 'Centro Educativo La Esperanza',
+      archivosAdjuntos: []
+    }
+  ]);
+  const [votantes, setVotantes] = useState([]);
+  const [mostrarVotantes, setMostrarVotantes] = useState(false);
   const [mostrarProcesos, setMostrarProcesos] = useState(false);
   const [mostrarCandidatos, setMostrarCandidatos] = useState(false);
   const [mostrarVotantesFinales,setMostrarVotantesFinales] = useState(false);
   const [organizacionSeleccionada, setOrganizacionSeleccionada] = useState('');
   const [votantesFinales, setVotantesFinales] = useState([
+  ]);
+  const [organizaciones, setorganizaciones] = useState([
+    {
+      nombre: 'Universidad Técnica Nacional',
+      tipo: 'Universidad Pública',
+      registroVotantes: 'manual',
+      votantes: []
+    },
+    {
+      nombre: 'Colegio Científico de Alajuela',
+      tipo: 'Colegio',
+      registroVotantes: 'automatica',
+      votantes: [{
+        nombre: 'Juan Pérez',
+        cedula: '101110111',
+        codigo: '12345'
+      },
+      {
+        nombre: 'María López',
+        cedula: '101110112',
+        codigo: '12346'
+      },
+      {
+        nombre: 'Carlos Rodríguez',
+        cedula: '101110113',
+        codigo: '12347'
+      }]
+    },
+    {
+      nombre: 'Centro Educativo La Esperanza',
+      tipo: 'Escuela Privada',
+      registroVotantes: 'manual',
+      votantes: []
+    }
   ]);
   const [mostrarorganizaciones, setMostrarorganizaciones] = useState(false);
   const [modoCandidato, setModoCandidato] = useState(null); 
@@ -28,7 +131,14 @@ function AdminPanel({ organizaciones, setOrganizaciones, candidatos, setCandidat
   const [modoOrganizacion, setModoOrganizacion] = useState(null);
   const [organizacionEditando, setOrganizacionEditando] = useState(null);
   const [modoVotante, setModoVotante] = useState(false);
+  const [organizacionParaVotar, setOrganizacionParaVotar] = useState(null);
+  const [cedulaLogin, setCedulaLogin] = useState('');
+  const [codigoLogin, setCodigoLogin] = useState('');
+  const [votanteLogueado, setVotanteLogueado] = useState(null);
+  const [votos, setVotos] = useState([]); 
+  const [votoRealizado, setVotoRealizado] = useState(false);
   
+
   const [procesos, setProcesos] = useState([
     {
       nombre: 'Proceso de Elecciones 2025',
@@ -80,7 +190,7 @@ const [campañas, setCampañas] = useState([
   };
 
   const registrarorganizacion = (nueva) => {
-    setOrganizaciones([...organizaciones, nueva]);
+    setorganizaciones([...organizaciones, nueva]);
     alert('Organización registrada con éxito');
     setTipoSeleccionado(null);
   };  
@@ -103,11 +213,13 @@ const [campañas, setCampañas] = useState([
             <button
               onClick={() => {
                 setTipoSeleccionado('ProcesoVotacion');
+                setMostrarVotantes(false);
                 setMostrarCandidatos(false);
                 setMostrarProcesos(false);
                 setMostrarorganizaciones(false);
                 setModoCandidato(null);
                 setModoOrganizacion(null);
+                setModoVotante(null); 
                 setModoProceso(true);
               }}             
               style={{
@@ -150,6 +262,7 @@ const [campañas, setCampañas] = useState([
             <button
               onClick={() => {
                 setMostrarCandidatos(false);
+                setMostrarVotantes(false);
                 setMostrarorganizaciones(false);
                 setTipoSeleccionado(null);
                 setModoCandidato(prev => prev === 'menu' ? null : 'menu');
@@ -311,6 +424,7 @@ const [campañas, setCampañas] = useState([
             onClick={() => {
               setTipoSeleccionado(null);
               setMostrarCandidatos(false);
+              setMostrarVotantes(false);
               setMostrarorganizaciones(false);
               setModoOrganizacion(prev => prev === 'menu' ? null : 'menu');
               setOrganizacionEditando(null);
@@ -467,24 +581,6 @@ const [campañas, setCampañas] = useState([
   </div>
 )}
 
-{mostrarVotantesFinales && (
-  <div style={{ marginTop: '2rem' }}>
-    <h3>Votantes registrados en {organizacionSeleccionada}:</h3>
-    {votantesFinales.length === 0 ? (
-      <p>No hay votantes registrados.</p>
-    ) : (
-      <ul style={{ listStyle: 'none', padding: 0 }}>
-        {votantesFinales.map((v, i) => (
-          <li key={i}>
-            {v.nombre} {v.apellido} - Cédula: {v.cedula}
-          </li>
-        ))}
-      </ul>
-    )}
-  </div>
-)}
-
-
 {tipoSeleccionado === 'candidato' && (
   <FormularioCandidato
     onRegistrar={(candidato) => {
@@ -532,29 +628,39 @@ const [campañas, setCampañas] = useState([
   />
 )}
 
+
+{tipoSeleccionado === 'votante' && (
+  <FormularioVotante
+    onRegistrar={registrarVotante}
+    votantes={votantes}
+    candidatos={candidatos}
+    onCancelar={() => setTipoSeleccionado(null)}
+  />
+)}
+
 {tipoSeleccionado === 'organizacion' && (
   <FormularioOrganizacion
-  onRegistrar={(organizacion) => {
-    if (organizacionEditando !== null) {
-      const nuevas = [...organizaciones];
-      nuevas[organizacionEditando.index] = organizacion;
-      setOrganizaciones(nuevas);
-    } else {
-      setOrganizaciones([...organizaciones, organizacion]);
-    }
-    alert('Información guardada correctamente');
-    setTipoSeleccionado(null);
-    setModoOrganizacion(null);
-    setOrganizacionEditando(null);
-  }}
-  organizaciones={organizaciones}
-  organizacionEditando={organizacionEditando} 
-  onCancelar={() => {
-    setTipoSeleccionado(null);
-    setModoOrganizacion(null);
-    setOrganizacionEditando(null);
-  }}
-/>
+    onRegistrar={(organizacion) => {
+      if (organizacionEditando !== null) {
+        const nuevas = [...organizaciones];
+        nuevas[organizacionEditando.index] = organizacion;
+        setorganizaciones(nuevas);
+      } else {
+        setorganizaciones([...organizaciones, organizacion]);
+      }
+      alert('Información guardada correctamente');
+      setTipoSeleccionado(null);
+      setModoOrganizacion(null);
+      setOrganizacionEditando(null);
+    }}
+    organizaciones={organizaciones}
+    organizacionEditando={organizacionEditando}
+    onCancelar={() => {
+      setTipoSeleccionado(null);
+      setModoOrganizacion(null);
+      setOrganizacionEditando(null);
+    }}
+  />
 
 )}
 
@@ -565,7 +671,7 @@ const [campañas, setCampañas] = useState([
       const nuevasOrganizaciones = organizaciones.map((org) => 
         org.nombre === organizacionEditando.nombre ? orgActualizada : org
       );
-      setOrganizaciones(nuevasOrganizaciones);
+      setorganizaciones(nuevasOrganizaciones);
       alert('Organización actualizada exitosamente');
       setTipoSeleccionado(null);
       setOrganizacionEditando(null);
@@ -579,8 +685,223 @@ const [campañas, setCampañas] = useState([
 </>
 )}
 
+{modoVotante && (
+      <>
+        {!organizacionParaVotar && (
+          <div style={{ textAlign: 'center' }}>
+            <h1 style={{ fontFamily: 'Bebas Neue', fontSize: '3rem' }}>Seleccione una organización para votar</h1>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem', flexWrap: 'wrap' }}>
+              {organizaciones.filter(org => candidatos.some(c => c.organizacion === org.nombre)).map((org, i) => (
+                <div key={i} style={{ border: '2px solid black', padding: '1rem', borderRadius: '10px', width: '300px' }}>
+                  <h2 style={{ fontFamily: 'Bebas Neue', fontSize: '2rem' }}>{org.nombre}</h2>
+                  <button
+                    onClick={() => setOrganizacionParaVotar(org)}
+                    style={{
+                      marginTop: '1rem',
+                      fontSize: '1.5rem',
+                      padding: '10px',
+                      borderRadius: '8px',
+                      backgroundColor: 'green',
+                      color: 'white',
+                      cursor: 'pointer',
+                      border: 'none'
+                    }}
+                  >
+                    Votar aquí
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {organizacionParaVotar && organizacionParaVotar.registroVotantes === 'manual' && (
+          !votanteLogueado ? (
+            <FormularioVotante
+              onRegistrar={(nuevoVotante) => {
+                const nuevasOrganizaciones = organizaciones.map((org) => {
+                  if (org.nombre === organizacionParaVotar.nombre) {
+                    return {
+                      ...org,
+                      votantes: [...org.votantes, nuevoVotante]
+                    };
+                  }
+                  return org;
+                });
+                setorganizaciones(nuevasOrganizaciones);
+                setVotanteLogueado(nuevoVotante);
+              }}
+              votantes={[]}
+              candidatos={candidatos.filter(c => c.organizacion === organizacionParaVotar.nombre)}
+              onCancelar={() => {
+                setModoVotante(false);
+                setOrganizacionParaVotar(null);
+              }}
+            />
+          ) : null 
+        )}
+
+        {modoVotante && organizacionParaVotar && organizacionParaVotar.registroVotantes === 'automatica' && !votanteLogueado && (
+          <div style={{ textAlign: 'center', marginTop: '2rem' }}>
+            <h2 style={{ fontFamily: 'Bebas Neue', fontSize: '2rem' }}>INICIAR SESIÓN PARA VOTAR</h2>
+
+            <input
+              placeholder="Cédula"
+              value={cedulaLogin}
+              onChange={(e) => setCedulaLogin(e.target.value)}
+              style={{ 
+                fontFamily: 'Bebas Neue', 
+                fontSize: '1.5rem', 
+                marginBottom: '1rem', 
+                padding: '10px', 
+                borderRadius: '8px',
+                width: '300px'
+              }}
+            />
+            <br />
+
+            <input
+              placeholder="Código de Verificación"
+              value={codigoLogin}
+              onChange={(e) => setCodigoLogin(e.target.value)}
+              style={{ 
+                fontFamily: 'Bebas Neue', 
+                fontSize: '1.5rem', 
+                marginBottom: '1rem', 
+                padding: '10px', 
+                borderRadius: '8px',
+                width: '300px'
+              }}
+            />
+            <br />
+
+            <button
+              onClick={() => {
+                // Validar campos no vacíos
+                if (!cedulaLogin || !codigoLogin) {
+                  alert('Por favor complete ambos campos');
+                  return;
+                }
+
+                // Depuración: Mostrar valores en consola
+                console.log('Buscando votante con:', {
+                  cedula: cedulaLogin.trim(),
+                  codigo: codigoLogin.trim(),
+                  organizacion: organizacionParaVotar.nombre
+                });
+
+                // Buscar en todas las organizaciones
+                const organizacion = organizaciones.find(
+                  org => org.nombre === organizacionParaVotar.nombre
+                );
+
+                if (!organizacion) {
+                  alert('Organización no encontrada');
+                  return;
+                }
+
+                console.log('Votantes en organización:', organizacion.votantes);
+
+                const votanteEncontrado = organizacion.votantes.find(
+                  v => v.cedula.toString() === cedulaLogin.trim() && 
+                      v.codigo.toString() === codigoLogin.trim()
+                );
+
+                console.log('Votante encontrado:', votanteEncontrado);
+
+                if (votanteEncontrado) {
+                  setVotanteLogueado(votanteEncontrado);
+                  setCedulaLogin('');
+                  setCodigoLogin('');
+                  alert('Ingreso exitoso. Ahora puede votar.');
+                } else {
+                  alert('Cédula o código incorrecto. Por favor intente nuevamente.');
+                }
+              }}
+              style={{
+                fontFamily: 'Bebas Neue',
+                fontSize: '1.5rem',
+                padding: '10px 20px',
+                backgroundColor: 'blue',
+                color: 'white',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                border: 'none',
+                marginRight: '10px',
+                marginTop: '10px'
+              }}
+            >
+              Ingresar y Votar
+            </button>
+
+            <button
+              onClick={() => {
+                setModoVotante(false);
+                setOrganizacionParaVotar(null);
+                setCedulaLogin('');
+                setCodigoLogin('');
+              }}
+              style={{
+                fontFamily: 'Bebas Neue',
+                fontSize: '1.5rem',
+                padding: '10px 20px',
+                backgroundColor: 'gray',
+                color: 'white',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                border: 'none',
+                marginTop: '10px'
+              }}
+            >
+              Cancelar
+            </button>
+          </div>
+        )}
+
+        {modoVotante && organizacionParaVotar && votanteLogueado && (
+          <div style={{ textAlign: 'center', marginTop: '2rem' }}>
+            <h2 style={{ fontFamily: 'Bebas Neue', fontSize: '2.5rem' }}>Elija un candidato para votar</h2>
+            <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '1rem', marginTop: '2rem' }}>
+              {candidatos.filter(c => c.organizacion === organizacionParaVotar.nombre).map((candidato, i) => (
+                <div key={i} style={{ border: '2px solid black', borderRadius: '10px', padding: '1rem', width: '250px' }}>
+                  <h3>{candidato.nombre} {candidato.apellido}</h3>
+                  <p style={{ fontSize: '1.2rem' }}>Plan: {candidato.plan}</p>
+                  <button
+                    onClick={() => {
+                      if (votos.some(v => v.cedula === votanteLogueado.cedula)) {
+                        alert('Ya ha votado. No puede votar de nuevo.');
+                      } else {
+                        setVotos([...votos, { cedula: votanteLogueado.cedula, candidato: `${candidato.nombre} ${candidato.apellido}` }]);
+                        alert(`Voto registrado para ${candidato.nombre} ${candidato.apellido}. ¡Gracias por participar!`);
+                        setModoVotante(false);
+                        setOrganizacionParaVotar(null);
+                        setVotanteLogueado(null);
+                        setCedulaLogin('');
+                        setCodigoLogin('');
+                      }
+                    }}
+                    style={{
+                      fontFamily: 'Bebas Neue',
+                      fontSize: '1.5rem',
+                      padding: '10px',
+                      backgroundColor: 'green',
+                      color: 'white',
+                      borderRadius: '8px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Votar por {candidato.nombre}
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+      </>
+    )}
   </div>
 );
 }
 
-export default AdminPanel;
+export default App;

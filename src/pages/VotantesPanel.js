@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import FormularioVotante from '../FormularioVotante';
 
-function VotantesPanel({ organizaciones, setOrganizaciones, candidatos }) {
+function VotantesPanel({ organizaciones, setorganizaciones, candidatos, votantes, setVotantes }) {
   const [modoVotante, setModoVotante] = useState(false);
   const [organizacionParaVotar, setOrganizacionParaVotar] = useState(null);
   const [cedulaLogin, setCedulaLogin] = useState('');
   const [codigoLogin, setCodigoLogin] = useState('');
   const [votanteLogueado, setVotanteLogueado] = useState(null);
   const [votos, setVotos] = useState([]);
+  const [votoRealizado, setVotoRealizado] = useState(false);
 
   return (
     <div>
@@ -63,7 +64,7 @@ function VotantesPanel({ organizaciones, setOrganizaciones, candidatos }) {
               }
               return org;
             });
-            setOrganizaciones(nuevasOrganizaciones);
+            setorganizaciones(nuevasOrganizaciones);
             setVotanteLogueado(nuevoVotante);
           }}
           votantes={[]}

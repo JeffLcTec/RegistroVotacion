@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import FormularioRegistrarVotantesOrg from './FormularioRegistrarVotantesOrg.js';
 
 
-export default function FormularioOrganizacion({ onRegistrar, organizaciones, onCancelar }) {
+export default function FormularioOrganizacion({ onRegistrar, organizaciones, onCancelar, organizacionEditando }) {
+
   const [formData, setFormData] = useState({
     nombre: '',
     tipo: '',
@@ -24,6 +25,7 @@ export default function FormularioOrganizacion({ onRegistrar, organizaciones, on
 
   const [votantesFinales, setVotantesFinales] = useState([]);
 
+
   const manejarRegistroVotantes = (votantes) => {
     setVotantesFinales(votantes);
     console.log('Votantes recibidos:', votantes); // podés almacenarlos, enviarlos al backend, etc.
@@ -43,11 +45,14 @@ export default function FormularioOrganizacion({ onRegistrar, organizaciones, on
       return;
     }
 
-    const yaExiste = organizaciones.some((i) => i.nombre === formData.nombre);
+    const yaExiste = organizaciones.some((i) =>
+      i.nombre === formData.nombre && (!organizacionEditando || i.nombre !== organizacionEditando.nombre)
+    );
     if (yaExiste) {
       alert('Ya existe una organización registrada con ese nombre.');
       return;
     }
+
     // Mandamos toda la organización con sus votantes incluidos
     const organizacionConVotantes = {
       ...formData,
