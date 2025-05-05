@@ -35,11 +35,6 @@ function AdminPanel({ organizaciones, setOrganizaciones, candidatos, setCandidat
       sector: 'Educación',
       organizacion: 'Universidad Técnica Nacional',
       descripcion: 'Elecciones para elegir representantes estudiantiles.',
-    },
-    {
-      nombre: 'Proceso de Elecciones 2026',
-      sector: 'Salud',
-      descripcion: 'Elecciones para elegir representantes de salud.',
     }
   ]);
   const [creandoProceso, setCreandoProceso] = useState(false);
@@ -55,25 +50,25 @@ const [campañas, setCampañas] = useState([
   {
     nombre: 'Directiva Tecnología 2025',
     miembros: [
-      { puesto: 'Presidente', correo: 'usado1@x.com' },
+      { puesto: 'Presidente', correo: 'rigo@gmail.com' },
     ],
     proceso: 'Proceso de Elecciones 2025',
   }
 ]);
   
-  const registrarCandidato = (nuevoCandidato) => {
-    if (candidatoEditando !== null) {
-      const actualizados = [...candidatos];
-      actualizados[candidatoEditando.index] = nuevoCandidato;
-      setCandidatos(actualizados);
-    } else {
-      setCandidatos([...candidatos, nuevoCandidato]);
-    }
+const registrarCandidato = (nuevoCandidato) => {
+  if (candidatoEditando !== null) {
+    const actualizados = [...candidatos];
+    actualizados[candidatoEditando.index] = { ...nuevoCandidato };
+    setCandidatos(actualizados);
+  } else {
+    setCandidatos([...candidatos, { ...nuevoCandidato }]);
+  }
 
-    setTipoSeleccionado(null);
-    setModoCandidato(null);
-    setCandidatoEditando(null);
-  };
+  setTipoSeleccionado(null);
+  setModoCandidato(null);
+  setCandidatoEditando(null);
+};
 
   const registrarVotante = (nuevoVotante) => {
     setVotantes([...votantes, nuevoVotante]);
@@ -85,7 +80,20 @@ const [campañas, setCampañas] = useState([
     setOrganizaciones([...organizaciones, nueva]);
     alert('Organización registrada con éxito');
     setTipoSeleccionado(null);
-  };  
+  };
+  
+  const registrarVotoCampaña = (nombreCampaña) => {
+    const actualizadas = [...campañas];
+    const index = actualizadas.findIndex((c) => c.nombre === nombreCampaña);
+    if (index !== -1) {
+      if (!actualizadas[index].votos) {
+        actualizadas[index].votos = 0; // Inicializar votos si no existe
+      }
+      actualizadas[index].votos += 1;
+      setCampañas(actualizadas);
+      alert(`Voto registrado para la campaña: ${nombreCampaña}`);
+    }
+  };
   
   return (
     
@@ -440,29 +448,8 @@ const [campañas, setCampañas] = useState([
     <h2>Lista de Candidatos</h2>
     <ul style={{ listStyle: 'none', padding: 0 }}>
       {candidatos.map((c, i) => (
-        <li key={i}>{c.nombre} {c.apellido} - Plan: {c.plan}</li>
-      ))}
-    </ul>
-  </div>
-)}
-
-{mostrarorganizaciones && (
-  <div style={{ marginTop: '2rem' }}>
-    <h2>Lista de organizaciones</h2>
-    <ul style={{ listStyle: 'none', padding: 0 }}>
-      {organizaciones.map((inst, i) => (
-        <li key={i} style={{ marginBottom: '1rem' }}>
-          {inst.nombre} - Registro: {inst.registroVotantes}
-          <button 
-            style={{ marginLeft: '1rem', fontSize: '17px', borderRadius: '5px' }}
-            onClick={() => {
-              setVotantesFinales(inst.votantes || []); // Asumiendo que cada organización tiene una lista de votantes
-              setMostrarVotantesFinales(true);
-              setOrganizacionSeleccionada(inst.nombre);
-            }}
-          >
-            Ver Votantes Registrados
-          </button>
+        <li key={i}>
+          {c.nombre} {c.apellido} - Plan: {c.plan}
         </li>
       ))}
     </ul>
@@ -507,6 +494,19 @@ const [campañas, setCampañas] = useState([
             Sector: {p.sector}<br />
             Organización: {p.organizacion || 'No asignada'}<br />
             {p.descripcion && <div>Descripción: {p.descripcion}</div>}
+            <h4 style={{ marginTop: '1rem' }}>Campañas:</h4>
+            <ul style={{ listStyle: 'none', padding: 0 }}>
+              {campañas
+                .filter((c) => c.proceso === p.nombre) // Filtrar campañas por proceso
+                .map((c, j) => (
+                  <li key={j} style={{ marginBottom: '0.5rem' }}>
+                    <strong>{c.nombre}</strong><br />
+                    Presidente:{" "}
+                    {c.miembros.find((m) => m.puesto === "Presidente")?.correo || "No asignado"}<br />
+                    Votos: {c.votos || 0}
+                  </li>
+                ))}
+            </ul>
           </li>
         ))}
       </ul>
