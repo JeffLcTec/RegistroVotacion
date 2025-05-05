@@ -8,6 +8,8 @@ export default function FormularioVotante({ onRegistrar, votantes, onCancelar, c
     cedula: ''
   });
 
+  console.log("FormularioVotante renderizado")
+
   const inputStyle = {
     fontFamily: 'Bebas Neue',
     width: '100%',
@@ -44,12 +46,17 @@ export default function FormularioVotante({ onRegistrar, votantes, onCancelar, c
       return;
     }
 
+    console.log("Intentando registrar:", formData);
+
     onRegistrar(formData);
+
     setFormData({ nombre: '', apellido: '', cedula: '' });
   };
 
   return (
+     
     <form onSubmit={handleSubmit} style={{ textAlign: 'center', maxWidth: '600px', margin: 'auto' }}>
+      
       <h2>Formulario Votante</h2>
 
       <input

@@ -10,15 +10,26 @@ import FormularioProcesoVotacion from '../FormularioProcesoVotacion';
 /*$env:NODE_OPTIONS="--openssl-legacy-provider"*/
 
 
-function AdminPanel({ organizaciones, setOrganizaciones, candidatos, setCandidatos, votantes, setVotantes }) {
-  
+function AdminPanel({
+  onCerrarSesion,
+  organizaciones,
+  setOrganizaciones,
+  candidatos,
+  setCandidatos,
+  votantes,
+  setVotantes,
+  procesos,
+  setProcesos,
+  campañas,
+  setCampañas
+}) {
+
   const [tipoSeleccionado, setTipoSeleccionado] = useState(null);
   const [mostrarProcesos, setMostrarProcesos] = useState(false);
   const [mostrarCandidatos, setMostrarCandidatos] = useState(false);
   const [mostrarVotantesFinales,setMostrarVotantesFinales] = useState(false);
   const [organizacionSeleccionada, setOrganizacionSeleccionada] = useState('');
-  const [votantesFinales, setVotantesFinales] = useState([
-  ]);
+  const [votantesFinales, setVotantesFinales] = useState([]);
   const [mostrarorganizaciones, setMostrarorganizaciones] = useState(false);
   const [modoCandidato, setModoCandidato] = useState(null); 
   const [modoProceso, setModoProceso] = useState(null);
@@ -28,33 +39,7 @@ function AdminPanel({ organizaciones, setOrganizaciones, candidatos, setCandidat
   const [modoOrganizacion, setModoOrganizacion] = useState(null);
   const [organizacionEditando, setOrganizacionEditando] = useState(null);
   const [modoVotante, setModoVotante] = useState(false);
-  
-  const [procesos, setProcesos] = useState([
-    {
-      nombre: 'Proceso de Elecciones 2025',
-      sector: 'Educación',
-      organizacion: 'Universidad Técnica Nacional',
-      descripcion: 'Elecciones para elegir representantes estudiantiles.',
-    }
-  ]);
-  const [creandoProceso, setCreandoProceso] = useState(false);
-  
-// Función para crear proceso
-const crearProceso = (nuevo) => {
-  setProcesos([...procesos, nuevo]);
-  setCreandoProceso(false);
-  alert('Proceso de votación creado exitosamente');
-};
 
-const [campañas, setCampañas] = useState([
-  {
-    nombre: 'Directiva Tecnología 2025',
-    miembros: [
-      { puesto: 'Presidente', correo: 'rigo@gmail.com' },
-    ],
-    proceso: 'Proceso de Elecciones 2025',
-  }
-]);
   
 const registrarCandidato = (nuevoCandidato) => {
   if (candidatoEditando !== null) {
@@ -101,7 +86,23 @@ const registrarCandidato = (nuevoCandidato) => {
       {!modoVotante && (
         <>
       <h1>ADMIN</h1>
-             
+      <button
+        onClick={onCerrarSesion}
+        style={{
+          backgroundColor: 'red',
+          color: 'white',
+          padding: '0.5rem 2rem',
+          fontFamily: 'Bebas Neue',
+          fontSize: '2rem',
+          border: 'none',
+          borderRadius: '10px',
+          cursor: 'pointer',
+          marginTop: '1rem'
+        }}
+      >
+        Cerrar sesión
+      </button>
+
 
       {!tipoSeleccionado && (
  
@@ -443,6 +444,21 @@ const registrarCandidato = (nuevoCandidato) => {
 
             </div>)} 
 
+
+{mostrarorganizaciones && (
+  <div style={{ marginTop: '2rem' }}>
+    <h2>Lista de Organizaciones</h2>
+    <ul style={{ listStyle: 'none', padding: 0 }}>
+      {organizaciones.map((org, i) => (
+        <li key={i}>
+          {org.nombre} - Tipo: {org.tipo} - Registro: {org.registroVotantes}
+        </li>
+      ))}
+    </ul>
+  </div>
+)}
+
+
 {mostrarCandidatos && (
   <div style={{ marginTop: '2rem' }}>
     <h2>Lista de Candidatos</h2>
@@ -502,7 +518,7 @@ const registrarCandidato = (nuevoCandidato) => {
                   <li key={j} style={{ marginBottom: '0.5rem' }}>
                     <strong>{c.nombre}</strong><br />
                     Presidente:{" "}
-                    {c.miembros.find((m) => m.puesto === "Presidente")?.correo || "No asignado"}<br />
+                    {c.miembros.find((m) => m.puesto === "Presidente")?.nombre || "No asignado"}<br />
                     Votos: {c.votos || 0}
                   </li>
                 ))}
@@ -517,35 +533,21 @@ const registrarCandidato = (nuevoCandidato) => {
 
 {tipoSeleccionado === 'candidato' && (
   <FormularioCandidato
-    onRegistrar={(candidato) => {
-      if (candidatoEditando !== null) {
-        const nuevos = [...candidatos];
-        nuevos[candidatoEditando.index] = candidato;
-        setCandidatos(nuevos);
-      } else {
-        setCandidatos([...candidatos, candidato]);
-      }
-      
-      alert('Información guardada correctamente');
-      setTipoSeleccionado(null);
-      setModoCandidato(null);
-      setCandidatoEditando(null);
-    }
-  }
-    procesos={procesos}
-    campañas={campañas}
-    setCampañas={setCampañas}
-    candidatos={candidatos}
-    candidatoEditando={candidatoEditando}
-    organizaciones={organizaciones}
-    onCancelar={() => {
-      setTipoSeleccionado(null);
-      setModoCandidato(null);
-      setCandidatoEditando(null);
-      setEsperandoConfirmacion(null);
-      setInputPassword('');
-    }}
-  />
+  onRegistrar={registrarCandidato}
+  procesos={procesos}
+  campañas={campañas}
+  setCampañas={setCampañas}
+  candidatos={candidatos}
+  candidatoEditando={candidatoEditando}
+  organizaciones={organizaciones}
+  onCancelar={() => {
+    setTipoSeleccionado(null);
+    setModoCandidato(null);
+    setCandidatoEditando(null);
+    setEsperandoConfirmacion(null);
+    setInputPassword('');
+  }}
+/>
 )}
 
 {tipoSeleccionado === 'ProcesoVotacion' && (

@@ -97,7 +97,12 @@ export default function FormularioCandidato({
         if (campaña.nombre === campañaSeleccionada) {
           return {
             ...campaña,
-            miembros: [...campaña.miembros, { puesto, correo: formData.correo }]
+            miembros: [...campaña.miembros, {
+              puesto,
+              correo: formData.correo,
+              nombre: formData.nombre+' ' + formData.apellido
+            }]
+            
           };
         }
         return campaña;
@@ -113,7 +118,12 @@ export default function FormularioCandidato({
           {
             nombre: formData.campaña,
             proceso: formData.proceso,
-            miembros: [{ puesto: puesto, correo: formData.correo }]
+            miembros: [{
+              puesto: puesto,
+              correo: formData.correo,
+              nombre: formData.nombre,
+              apellido: formData.apellido
+            }]
           }
         ]);
       } else {
@@ -121,13 +131,22 @@ export default function FormularioCandidato({
           if (c.nombre === formData.campaña) {
             return {
               ...c,
-              miembros: [...c.miembros, { puesto: puesto, correo: formData.correo }]
+              miembros: [
+                ...c.miembros,
+                {
+                  puesto: puesto,
+                  correo: formData.correo,
+                  nombre: formData.nombre,
+                  apellido: formData.apellido
+                }
+              ]
             };
           }
           return c;
         }));
       }
     }
+    
     const finalFormData = {
       ...formData,
       campaña: modoCampaña === 'nueva' ? formData.campaña : campañaSeleccionada,
