@@ -23,6 +23,17 @@ function App() {
         { puesto: 'Vicepresidente', correo: 'vp@correo.com', nombre: 'Andrés Sánchez' }
       ],
       proceso: 'Proceso de Elecciones 2025',
+      organizacion: 'Universidad Técnica Nacional',
+      votos: 0,
+    },
+    {
+      nombre: 'Directiva Tecnología 2025',
+      miembros: [
+        { puesto: 'Presidente', correo: 'usado1@x.com', nombre: 'Laura Jiménez' },
+        { puesto: 'Vicepresidente', correo: 'vp@correo.com', nombre: 'Andrés Sánchez' }
+      ],
+      proceso: 'Proceso de Elecciones 2025',
+      organizacion: 'Universidad nigger Nacional',
       votos: 0,
     },
     {
@@ -56,7 +67,16 @@ function App() {
       ],
       proceso: 'Proceso Electoral Interno 2025',
       votos: 0,
-    }
+    },
+    {
+      nombre: 'Futuro Estudiantil',
+      miembros: [
+        { puesto: 'Presidente', correo: 'lol@gmail.com', nombre: 'Roberto Chacon' }
+      ],
+      proceso: 'Elecciones Estudiantiles 2025',
+      organizacion: 'Colegio Científico de Alajuela',
+      votos: 2,
+    },
   ]);
   
   const [procesos, setProcesos] = useState([
@@ -89,6 +109,12 @@ function App() {
       sector: 'Salud',
       organizacion: 'Hospital Nacional de Niños',
       descripcion: 'Elecciones sindicales internas para el período 2025-2027.',
+    },
+    {
+      nombre: 'Elecciones Estudiantiles 2025',
+      sector: 'estudiantil',
+      organizacion: 'Colegio Científico de Alajuela',
+      descripcion: 'Elecciones para elegir representantes estudiantiles.',
     }
   ]);
   

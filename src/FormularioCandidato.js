@@ -118,6 +118,7 @@ export default function FormularioCandidato({
           {
             nombre: formData.campaña,
             proceso: formData.proceso,
+            organizacion: formData.organizacion,
             miembros: [{
               puesto: puesto,
               correo: formData.correo,

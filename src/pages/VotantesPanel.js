@@ -12,7 +12,11 @@ function VotantesPanel({ onCancelar,organizaciones, setorganizaciones, candidato
   const [votoRealizado, setVotoRealizado] = useState(false);
 
   const procesosPorOrganizacion = procesos.filter(p => p.organizacion === organizacionSeleccionada?.nombre);
-  const campañasPorProceso = campañas.filter(c => c.proceso === procesoSeleccionado?.nombre);
+  const campañasPorProceso = campañas.filter(c => 
+    c.proceso === procesoSeleccionado?.nombre &&
+    c.organizacion === organizacionSeleccionada?.nombre
+  );
+  
   const candidatosFiltrados = candidatos.filter(c => c.organizacion === organizacionSeleccionada?.nombre && c.proceso === procesoSeleccionado?.nombre);
   return (
     <div>
