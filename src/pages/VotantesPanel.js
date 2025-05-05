@@ -32,7 +32,10 @@ function VotantesPanel({ organizaciones, setorganizaciones, candidatos, votantes
                 >
                   <h3>{org.nombre}</h3>
                   <button
-                    onClick={() => setOrganizacionParaVotar(org)}
+                    onClick={() => {
+                      setOrganizacionParaVotar(org);
+                      setModoVotante(true);
+                    }}
                     style={{
                       marginTop: '1rem',
                       fontSize: '1.5rem',
