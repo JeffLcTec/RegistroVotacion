@@ -104,7 +104,7 @@ function VotantesPanel({ onCancelar, organizaciones, setorganizaciones, candidat
       );
     }
 
-    if (!organizacionSeleccionada.votantes.some(v => v.cedula === votanteLogueado.cedula) && organizacionSeleccionada.registroVotantes === 'automatica') {
+    if (!organizacionSeleccionada.votantes.some(v => v.cedula === votanteLogueado.cedula) && organizacionSeleccionada.registroVotantes === 'privada') {
       return (
         <div style={{ fontFamily: 'Bebas Neue', textAlign: 'center', marginTop: '2rem' }}>
           <h2>No estás habilitado para votar en esta organización.</h2>
