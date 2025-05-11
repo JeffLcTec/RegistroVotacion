@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import AdminPanel from './pages/AdminPanel';
 import VotantesPanel from './pages/VotantesPanel';
+import FormularioVotante from './FormularioVotante';
+import ResultadosPanel from './pages/ResultadosPanel';
 
 function App() {
 
@@ -9,65 +11,47 @@ function App() {
   const [modoOrganizacion, setModoOrganizacion] = useState(null);
   const [modoProceso, setModoProceso] = useState(null);
   const [modoVotante, setModoVotante] = useState(false); // false por defecto
+  const [modoResultados, setModoResultados] = useState(false);
   const [rol, setRol] = useState(null);
   const [autenticado, setAutenticado] = useState(false);
+  const [correoLogin, setCorreoLogin] = useState('');
+  const [claveLogin, setClaveLogin] = useState('');
   const [cedulaLogin, setCedulaLogin] = useState('');
   const [codigoLogin, setCodigoLogin] = useState('');
-  const [votantes, setVotantes] = useState([]);
+  const [votantes, setVotantes] = useState([
+    {
+      nombre: 'Jose Roberto',
+      apellido: 'Chacón Barrantes',
+      cedula: '208770590',
+      correo: 'roberto@correo.com',
+      contraseña: 'roberto123'
+    }
+  ]);  
+  const [votanteActual, setVotanteActual] = useState(null);
+  const [modoLoginVotante, setModoLoginVotante] = useState(null); // 'login' | 'registro'
 
   const [campañas, setCampañas] = useState([
+    // UTN
     {
       nombre: 'Directiva Tecnología 2025',
       miembros: [
-        { puesto: 'Presidente', correo: 'usado1@x.com', nombre: 'Laura Jiménez' },
-        { puesto: 'Vicepresidente', correo: 'vp@correo.com', nombre: 'Andrés Sánchez' }
+        { puesto: 'Presidente', correo: 'usado1@x.com', nombre: 'Laura Jiménez' }
       ],
       proceso: 'Proceso de Elecciones 2025',
       organizacion: 'Universidad Técnica Nacional',
-      votos: 0,
+      votos: 0
     },
     {
-      nombre: 'Directiva Tecnología 2025',
+      nombre: 'Consejo Verde 2025',
       miembros: [
-        { puesto: 'Presidente', correo: 'usado1@x.com', nombre: 'Laura Jiménez' },
-        { puesto: 'Vicepresidente', correo: 'vp@correo.com', nombre: 'Andrés Sánchez' }
+        { puesto: 'Presidente', correo: 'vp@correo.com', nombre: 'Andrés Sánchez' }
       ],
       proceso: 'Proceso de Elecciones 2025',
-      organizacion: 'Universidad nigger Nacional',
-      votos: 0,
+      organizacion: 'Universidad Técnica Nacional',
+      votos: 0
     },
-    {
-      nombre: 'Campaña Salud 2026',
-      miembros: [
-        { puesto: 'Presidente', correo: 'salud@correo.com', nombre: 'Nombre Desconocido' } // No está en candidatos
-      ],
-      proceso: 'Proceso de Elecciones 2026',
-      votos: 0,
-    },
-    {
-      nombre: 'Unidad Escolar Progresista',
-      miembros: [
-        { puesto: 'Tesorero', correo: 'tesorero@escolar.com', nombre: 'Gabriel Alpízar' }
-      ],
-      proceso: 'Elecciones Junta Administrativa 2025',
-      votos: 0,
-    },
-    {
-      nombre: 'Consejo Joven Futuro',
-      miembros: [
-        { puesto: 'Coordinador General', correo: 'coordinador@redjoven.org', nombre: 'Nombre Desconocido' }
-      ],
-      proceso: 'Asamblea Nacional de Asociaciones 2026',
-      votos: 0,
-    },
-    {
-      nombre: 'Sindicato Transparente',
-      miembros: [
-        { puesto: 'Secretario General', correo: 'secretario@hnn.cr', nombre: 'Nombre Desconocido' }
-      ],
-      proceso: 'Proceso Electoral Interno 2025',
-      votos: 0,
-    },
+  
+    // CCA
     {
       nombre: 'Futuro Estudiantil',
       miembros: [
@@ -75,8 +59,109 @@ function App() {
       ],
       proceso: 'Elecciones Estudiantiles 2025',
       organizacion: 'Colegio Científico de Alajuela',
-      votos: 2,
+      votos: 0
     },
+    {
+      nombre: 'Renovación CCA',
+      miembros: [
+        { puesto: 'Presidente', correo: 'valeria.castro@cca.cr', nombre: 'Valeria Castro' }
+      ],
+      proceso: 'Elecciones Estudiantiles 2025',
+      organizacion: 'Colegio Científico de Alajuela',
+      votos: 0
+    },
+  
+    // La Esperanza
+    {
+      nombre: 'Progreso Escolar',
+      miembros: [
+        { puesto: 'Presidente', correo: 'gabriel.alpizar@laesperanza.cr', nombre: 'Gabriel Alpízar' }
+      ],
+      proceso: 'Elección Académica 2025',
+      organizacion: 'Centro Educativo La Esperanza',
+      votos: 0
+    },
+    {
+      nombre: 'Inclusión y Futuro',
+      miembros: [
+        { puesto: 'Presidente', correo: 'fernanda.rojas@laesperanza.cr', nombre: 'Fernanda Rojas' }
+      ],
+      proceso: 'Elección Académica 2025',
+      organizacion: 'Centro Educativo La Esperanza',
+      votos: 0
+    },
+  
+    // Cartago
+    {
+      nombre: 'Cartago Avanza',
+      miembros: [
+        { puesto: 'Presidente', correo: 'carlos.mora@escuelacentral.cr', nombre: 'Carlos Mora' }
+      ],
+      proceso: 'Junta Escolar 2025',
+      organizacion: 'Escuela Central de Cartago',
+      votos: 0
+    },
+    {
+      nombre: 'Educación Moderna',
+      miembros: [
+        { puesto: 'Presidente', correo: 'julian.castro@escuelacentral.cr', nombre: 'Julián Castro' }
+      ],
+      proceso: 'Junta Escolar 2025',
+      organizacion: 'Escuela Central de Cartago',
+      votos: 0
+    },
+  
+    // HNN
+    {
+      nombre: 'Sindicato Transparente',
+      miembros: [
+        { puesto: 'Presidente', correo: 'luis.solis@hnn.cr', nombre: 'Luis Solís' }
+      ],
+      proceso: 'Sindicato HNN 2025',
+      organizacion: 'Hospital Nacional de Niños',
+      votos: 0
+    },
+  
+    // Red Juvenil
+    {
+      nombre: 'Red Activa Joven',
+      miembros: [
+        { puesto: 'Presidente', correo: 'daniela.ramos@redjoven.org', nombre: 'Daniela Ramos' }
+      ],
+      proceso: 'Asamblea Juvenil 2026',
+      organizacion: 'Red de Organizaciones Juveniles',
+      votos: 0
+    },
+
+    //campañas finalizadas
+    {
+    nombre: 'Unidad Estudiantil',
+    miembros: [{ puesto: 'Presidente', nombre: 'Laura Jiménez', correo: 'laura@utn.cr' }],
+    proceso: 'Elecciones Estudiantiles 2024',
+    organizacion: 'Universidad Técnica Nacional',
+    votos: 42
+  },
+  {
+    nombre: 'Estudiantes al Poder',
+    miembros: [{ puesto: 'Presidente', nombre: 'Carlos Mora', correo: 'carlos@utn.cr' }],
+    proceso: 'Elecciones Estudiantiles 2024',
+    organizacion: 'Universidad Técnica Nacional',
+    votos: 65
+  },
+  {
+    nombre: 'Jóvenes por el Cambio',
+    miembros: [{ puesto: 'Presidente', nombre: 'Daniela Ramos', correo: 'daniela@red.org' }],
+    proceso: 'Asamblea General ONG 2024',
+    organizacion: 'Red de Organizaciones Juveniles',
+    votos: 88
+  },
+  {
+    nombre: 'Fuerza Juvenil',
+    miembros: [{ puesto: 'Presidente', nombre: 'Luis Solís', correo: 'luis@red.org' }],
+    proceso: 'Asamblea General ONG 2024',
+    organizacion: 'Red de Organizaciones Juveniles',
+    votos: 51
+  }
   ]);
   
   const [procesos, setProcesos] = useState([
@@ -84,182 +169,345 @@ function App() {
       nombre: 'Proceso de Elecciones 2025',
       sector: 'Educación',
       organizacion: 'Universidad Técnica Nacional',
-      descripcion: 'Elecciones para elegir representantes estudiantiles.',
-    },
-    {
-      nombre: 'Elecciones Junta Administrativa 2025',
-      sector: 'Administración',
-      organizacion: 'Escuela Central de Cartago',
-      descripcion: 'Elección anual de la junta administrativa escolar.',
-    },
-    {
-      nombre: 'Votación Consejo Consultivo 2026',
-      sector: 'Tecnología',
-      organizacion: 'Colegio de Profesionales en Informática',
-      descripcion: 'Designación de nuevos miembros del consejo técnico consultivo.',
-    },
-    {
-      nombre: 'Asamblea Nacional de Asociaciones 2026',
-      sector: 'Social',
-      organizacion: 'Red de Organizaciones Juveniles',
-      descripcion: 'Votación para elegir coordinadores nacionales por sector.',
-    },
-    {
-      nombre: 'Proceso Electoral Interno 2025',
-      sector: 'Salud',
-      organizacion: 'Hospital Nacional de Niños',
-      descripcion: 'Elecciones sindicales internas para el período 2025-2027.',
+      descripcion: 'Elecciones para elegir representantes estudiantiles.'
     },
     {
       nombre: 'Elecciones Estudiantiles 2025',
-      sector: 'estudiantil',
+      sector: 'Secundaria',
       organizacion: 'Colegio Científico de Alajuela',
-      descripcion: 'Elecciones para elegir representantes estudiantiles.',
+      descripcion: 'Elección de directiva estudiantil.'
+    },
+    {
+      nombre: 'Elección Académica 2025',
+      sector: 'Privado',
+      organizacion: 'Centro Educativo La Esperanza',
+      descripcion: 'Elección de comité de apoyo estudiantil.'
+    },
+    {
+      nombre: 'Junta Escolar 2025',
+      sector: 'Primaria',
+      organizacion: 'Escuela Central de Cartago',
+      descripcion: 'Votación anual escolar.'
+    },
+    {
+      nombre: 'Sindicato HNN 2025',
+      sector: 'Salud',
+      organizacion: 'Hospital Nacional de Niños',
+      descripcion: 'Votación interna de líderes sindicales.'
+    },
+    {
+      nombre: 'Asamblea Juvenil 2026',
+      sector: 'Social',
+      organizacion: 'Red de Organizaciones Juveniles',
+      descripcion: 'Votación de coordinadores de juventud.'
     }
   ]);
+  
+  const [procesosFinalizados, setProcesosFinalizados] = useState([
+  {
+    nombre: 'Elecciones Estudiantiles 2024',
+    sector: 'Educación',
+    organizacion: 'Universidad Técnica Nacional',
+    descripcion: 'Elección de representantes estudiantiles para el período 2024-2025.'
+  },
+  {
+    nombre: 'Asamblea General ONG 2024',
+    sector: 'Social',
+    organizacion: 'Red de Organizaciones Juveniles',
+    descripcion: 'Proceso para elegir nuevos coordinadores regionales.'
+  }
+]);
+
+
+  const finalizarProceso = (nombreProceso) => {
+    const procesoAEliminar = procesos.find(p => p.nombre === nombreProceso);
+    if (!procesoAEliminar) return;
+
+    setProcesosFinalizados(prev => [...prev, procesoAEliminar]);
+    setProcesos(prev => prev.filter(p => p.nombre !== nombreProceso));
+  };
   
   const [creandoProceso, setCreandoProceso] = useState(false);
 
   const [candidatos, setCandidatos] = useState([
-      // Universidad Técnica Nacional
-      {
-        nombre: 'Laura',
-        apellido: 'Jiménez',
-        correo: 'laura.jimenez@utn.ac.cr',
-        contraseña: 'laura123',
-        plan: 'Innovación educativa para el futuro.',
-        ideas: 'Fortalecer la investigación y los proyectos interdisciplinarios en la UTN.',
-        organizacion: 'Universidad Técnica Nacional',
-        archivosAdjuntos: []
-      },
-      {
-        nombre: 'Andrés',
-        apellido: 'Sánchez',
-        correo: 'andres.sanchez@utn.ac.cr',
-        contraseña: 'andres123',
-        plan: 'Universidad verde y sostenible.',
-        ideas: 'Implementar proyectos de energía limpia y huertas urbanas en todos los campus.',
-        organizacion: 'Universidad Técnica Nacional',
-        archivosAdjuntos: []
-      },
-    
-      // Colegio Científico de Alajuela
-      {
-        nombre: 'Valeria',
-        apellido: 'Castro',
-        correo: 'valeria.castro@cca.cr',
-        contraseña: 'valeria123',
-        plan: 'Más actividades deportivas y culturales.',
-        ideas: 'Crear nuevos clubes de arte y tecnología para los estudiantes.',
-        organizacion: 'Colegio Científico de Alajuela',
-        archivosAdjuntos: []
-      },
-      {
-        nombre: 'Diego',
-        apellido: 'Mora',
-        correo: 'diego.mora@cca.cr',
-        contraseña: 'diego123',
-        plan: 'Mejoras en infraestructura educativa.',
-        ideas: 'Modernizar los laboratorios de ciencias y tecnología.',
-        organizacion: 'Colegio Científico de Alajuela',
-        archivosAdjuntos: []
-      },
-    
-      // Centro Educativo La Esperanza
-      {
-        nombre: 'Fernanda',
-        apellido: 'Rojas',
-        correo: 'fernanda.rojas@laesperanza.cr',
-        contraseña: 'fernanda123',
-        plan: 'Educación inclusiva para todos.',
-        ideas: 'Desarrollar programas de tutorías para estudiantes con dificultades de aprendizaje.',
-        organizacion: 'Centro Educativo La Esperanza',
-        archivosAdjuntos: []
-      },
-      {
-        nombre: 'Gabriel',
-        apellido: 'Alpízar',
-        correo: 'gabriel.alpizar@laesperanza.cr',
-        contraseña: 'gabriel123',
-        plan: 'Tecnología para el aprendizaje.',
-        ideas: 'Implementar tablets y plataformas digitales en todas las clases.',
-        organizacion: 'Centro Educativo La Esperanza',
-        archivosAdjuntos: []
-      }
-    ]);
+    // UTN
+    {
+      nombre: 'Laura',
+      apellido: 'Jiménez',
+      correo: 'usado1@x.com',
+      contraseña: 'laura123',
+      plan: 'Educación transformadora',
+      ideas: 'Rediseñar el currículo estudiantil',
+      organizacion: 'Universidad Técnica Nacional',
+      archivosAdjuntos: []
+    },
+    {
+      nombre: 'Andrés',
+      apellido: 'Sánchez',
+      correo: 'vp@correo.com',
+      contraseña: 'andres123',
+      plan: 'Universidad sostenible',
+      ideas: 'Instalación de paneles solares',
+      organizacion: 'Universidad Técnica Nacional',
+      archivosAdjuntos: []
+    },
+  
+    // CCA
+    {
+      nombre: 'Roberto',
+      apellido: 'Chacon',
+      correo: 'lol@gmail.com',
+      contraseña: 'roberto123',
+      plan: 'Actividades estudiantiles',
+      ideas: 'Más ferias científicas y culturales',
+      organizacion: 'Colegio Científico de Alajuela',
+      archivosAdjuntos: []
+    },
+    {
+      nombre: 'Valeria',
+      apellido: 'Castro',
+      correo: 'valeria.castro@cca.cr',
+      contraseña: 'valeria123',
+      plan: 'Mejor infraestructura',
+      ideas: 'Remodelar aulas',
+      organizacion: 'Colegio Científico de Alajuela',
+      archivosAdjuntos: []
+    },
+  
+    // La Esperanza
+    {
+      nombre: 'Gabriel',
+      apellido: 'Alpízar',
+      correo: 'gabriel.alpizar@laesperanza.cr',
+      contraseña: 'gabriel123',
+      plan: 'Tecnología en aulas',
+      ideas: 'Clases con tabletas',
+      organizacion: 'Centro Educativo La Esperanza',
+      archivosAdjuntos: []
+    },
+    {
+      nombre: 'Fernanda',
+      apellido: 'Rojas',
+      correo: 'fernanda.rojas@laesperanza.cr',
+      contraseña: 'fernanda123',
+      plan: 'Educación inclusiva',
+      ideas: 'Tutorías especializadas',
+      organizacion: 'Centro Educativo La Esperanza',
+      archivosAdjuntos: []
+    },
+  
+    // Cartago
+    {
+      nombre: 'Carlos',
+      apellido: 'Mora',
+      correo: 'carlos.mora@escuelacentral.cr',
+      contraseña: 'carlos123',
+      plan: 'Gestión participativa',
+      ideas: 'Presupuesto escolar abierto',
+      organizacion: 'Escuela Central de Cartago',
+      archivosAdjuntos: []
+    },
+    {
+      nombre: 'Julián',
+      apellido: 'Castro',
+      correo: 'julian.castro@escuelacentral.cr',
+      contraseña: 'julian123',
+      plan: 'Aulas inteligentes',
+      ideas: 'Pantallas interactivas',
+      organizacion: 'Escuela Central de Cartago',
+      archivosAdjuntos: []
+    },
+  
+    // HNN
+    {
+      nombre: 'Luis',
+      apellido: 'Solís',
+      correo: 'luis.solis@hnn.cr',
+      contraseña: 'luis123',
+      plan: 'Transparencia sindical',
+      ideas: 'Publicar informes de gestión',
+      organizacion: 'Hospital Nacional de Niños',
+      archivosAdjuntos: []
+    },
+  
+    // Red Juvenil
+    {
+      nombre: 'Daniela',
+      apellido: 'Ramos',
+      correo: 'daniela.ramos@redjoven.org',
+      contraseña: 'daniela123',
+      plan: 'Liderazgo joven',
+      ideas: 'Capacitaciones nacionales',
+      organizacion: 'Red de Organizaciones Juveniles',
+      archivosAdjuntos: []
+    }
+  ]);
+  
+  
 
-    const [organizaciones, setorganizaciones] = useState([
+  const [organizaciones, setorganizaciones] = useState([
       {
         nombre: 'Universidad Técnica Nacional',
         tipo: 'Universidad Pública',
-        registroVotantes: 'manual',
+        registroVotantes: 'publica',
         votantes: []
       },
       {
         nombre: 'Colegio Científico de Alajuela',
         tipo: 'Colegio',
-        registroVotantes: 'automatica',
+        registroVotantes: 'privada',
         votantes: [
-          { nombre: 'Juan Pérez', cedula: '101110111', codigo: '12345' },
-          { nombre: 'María López', cedula: '101110112', codigo: '12346' },
-          { nombre: 'Carlos Rodríguez', cedula: '101110113', codigo: '12347' }
+          { cedula: '101110111'},
+          { cedula: '101110112'}
         ]
       },
       {
         nombre: 'Centro Educativo La Esperanza',
         tipo: 'Escuela Privada',
-        registroVotantes: 'manual',
+        registroVotantes: 'publica',
         votantes: []
       },
       {
         nombre: 'Escuela Central de Cartago',
         tipo: 'Escuela Pública',
-        registroVotantes: 'manual',
-        votantes: []
-      },
-      {
-        nombre: 'Colegio de Profesionales en Informática',
-        tipo: 'Colegio Profesional',
-        registroVotantes: 'automatica',
-        votantes: [
-          { nombre: 'Laura Salazar', cedula: '102220111', codigo: '45678' },
-          { nombre: 'Andrés Jiménez', cedula: '102220112', codigo: '45679' }
-        ]
-      },
-      {
-        nombre: 'Red de Organizaciones Juveniles',
-        tipo: 'Organización No Gubernamental',
-        registroVotantes: 'manual',
+        registroVotantes: 'publica',
         votantes: []
       },
       {
         nombre: 'Hospital Nacional de Niños',
         tipo: 'Institución Pública',
-        registroVotantes: 'automatica',
+        registroVotantes: 'privada',
         votantes: [
-          { nombre: 'Gabriela Rojas', cedula: '103330111', codigo: '78901' }
+          { cedula: '103330111'}
         ]
+      },
+      {
+        nombre: 'Red de Organizaciones Juveniles',
+        tipo: 'ONG',
+        registroVotantes: 'publica',
+        votantes: []
       }
     ]);
     
+    
+  if (modoResultados) {
+    return (
+      <ResultadosPanel
+        procesosFinalizados={procesosFinalizados}
+        campañas={campañas}
+        onVolver={() => setModoResultados(false)}
+      />
+    );
+  }
+  
   // Mostrar selección de rol
   if (!rol) {
     return (
       <div style={{ textAlign: 'center', marginTop: '5rem', fontFamily: 'Bebas Neue' }}>
-        <h1>Seleccione su rol</h1>
-        <button
-          onClick={() => setRol('votante')}
-          style={botonEstilo('red')}
-        >
-          Votante
+        <h1>¿Qué desea hacer?</h1>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <button onClick={() => setRol('votante')} style={botonEstilo('red')}>Votante</button>
+          <button onClick={() => setRol('admin')} style={botonEstilo('blue')}>Administrador</button>
+          <button onClick={() => setModoResultados(true)} style={botonEstilo('green')}>Ver Resultados</button>
+        </div>
+      </div>
+    );
+  }
+
+  // Lógica de ingreso del votante
+  if (rol === 'votante' && !votanteActual && !modoLoginVotante) {
+    return (
+      <div style={{ textAlign: 'center', marginTop: '5rem', fontFamily: 'Bebas Neue' }}>
+        <h1>Bienvenido votante</h1>
+        <button style={botonEstilo('green')} onClick={() => setModoLoginVotante('login')}>
+          Iniciar sesión
         </button>
-        <button
-          onClick={() => setRol('admin')}
-          style={botonEstilo('blue')}
-        >
-          Administrador
+        <button style={botonEstilo('orange')} onClick={() => setModoLoginVotante('registro')}>
+          Registrarse
+        </button>
+        <button style={botonEstilo('gray')} onClick={() => setRol(null)}>
+          Volver
         </button>
       </div>
+    );
+  }
+
+  if (rol === 'votante' && modoLoginVotante === 'registro') {
+    return (
+      <FormularioVotante
+        votantes={votantes}
+        onRegistrar={(nuevo) => {
+          setVotantes([...votantes, nuevo]);
+          setVotanteActual(nuevo);
+          setModoLoginVotante(null);
+        }}
+        onCancelar={() => setModoLoginVotante(null)}
+      />
+    );
+  }
+
+  if (rol === 'votante' && modoLoginVotante === 'login') {
+    return (
+      <div style={{ textAlign: 'center', marginTop: '5rem', fontFamily: 'Bebas Neue' }}>
+        <h1>Login de Votante</h1>
+        <input
+          placeholder="Correo"
+          style={inputEstilo}
+          value={correoLogin}
+          onChange={(e) => setCorreoLogin(e.target.value)}
+        /><br />
+        <input
+          type="password"
+          placeholder="Contraseña"
+          style={inputEstilo}
+          value={claveLogin}
+          onChange={(e) => setClaveLogin(e.target.value)}
+        /><br />
+        <button
+          style={botonEstilo('green')}
+          onClick={() => {
+            const encontrado = votantes.find(
+              (v) => v.correo === correoLogin.trim() && v.contraseña === claveLogin.trim()
+            );
+            if (encontrado) {
+              setVotanteActual(encontrado);
+              setModoLoginVotante(null);
+              setCorreoLogin('');
+              setClaveLogin('');
+            } else {
+              alert('Correo o contraseña incorrectos.');
+            }
+          }}
+        >
+          Ingresar
+        </button>
+        <button style={botonEstilo('gray')} onClick={() => setModoLoginVotante(null)}>
+          Volver
+        </button>
+      </div>
+    );
+  }
+
+  // Panel votante con sesión activa
+  if (rol === 'votante' && votanteActual) {
+    return (
+      <VotantesPanel
+        votanteLogueado={votanteActual}
+        setVotanteLogueado={setVotanteActual}
+        organizaciones={organizaciones}
+        setorganizaciones={setorganizaciones}
+        candidatos={candidatos}
+        votantes={votantes}
+        setVotantes={setVotantes}
+        procesos={procesos}
+        campañas={campañas}
+        setCampañas={setCampañas}
+        onCancelar={() => {
+          setRol(null);
+          setVotanteActual(null);
+          setModoLoginVotante(null);
+        }}
+      />
     );
   }
 
@@ -329,6 +577,9 @@ function App() {
   setVotantes={setVotantes}
   procesos={procesos}
   setProcesos={setProcesos}
+  procesosFinalizados={procesosFinalizados}
+  setProcesosFinalizados={setProcesosFinalizados}
+  finalizarProceso={finalizarProceso}
   campañas={campañas}
   setCampañas={setCampañas}
   onCerrarSesion={() => {
@@ -340,22 +591,23 @@ function App() {
 />
     );
   }
+
   
-  if (rol === 'votante') {
-    return (
-      <VotantesPanel
-        organizaciones={organizaciones}
-        setorganizaciones={setorganizaciones}
-        candidatos={candidatos}
-        votantes={votantes}
-        setVotantes={setVotantes}
-        procesos={procesos}
-        campañas={campañas}
-        setCampañas={setCampañas}
-        onCancelar={() => {setRol(null);}}
-      />
-    );
-  }  
+  //if (rol === 'votante') {
+  //  return (
+  //    <VotantesPanel
+  //      organizaciones={organizaciones}
+  //      setorganizaciones={setorganizaciones}
+  //      candidatos={candidatos}
+  //      votantes={votantes}
+  //      setVotantes={setVotantes}
+  //      procesos={procesos}
+  //      campañas={campañas}
+  //      setCampañas={setCampañas}
+  //      onCancelar={() => {setRol(null);}}
+  //    />
+  //  );
+  //}  
 
   return null;
 }

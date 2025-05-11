@@ -1,274 +1,201 @@
+// VotantesPanel.js actualizado con persistencia en votanteLogueado (votosEmitidos)
 import React, { useState } from 'react';
 import FormularioVotante from '../FormularioVotante';
 
-function VotantesPanel({ onCancelar,organizaciones, setorganizaciones, candidatos, votantes, setVotantes , procesos, campañas,setCampañas }) {
-  const [modoVotante, setModoVotante] = useState(false);
+function VotantesPanel({ onCancelar, organizaciones, setorganizaciones, candidatos, votantes, setVotantes, procesos, campañas, setCampañas, votanteLogueado, setVotanteLogueado }) {
+  const [modo, setModo] = useState(null); // 'ver' | 'votar'
   const [organizacionSeleccionada, setOrganizacionSeleccionada] = useState(null);
   const [procesoSeleccionado, setProcesoSeleccionado] = useState(null);
-  const [cedulaLogin, setCedulaLogin] = useState('');
-  const [codigoLogin, setCodigoLogin] = useState('');
-  const [votanteLogueado, setVotanteLogueado] = useState(null);
-  const [votos, setVotos] = useState([]);
-  const [votoRealizado, setVotoRealizado] = useState(false);
+
+  const campañasValidas = campañas.filter(c => c.miembros && c.miembros.length > 0);
+  const organizacionesConCampañas = organizaciones.filter(org =>
+    campañasValidas.some(c => c.organizacion === org.nombre)
+  );
 
   const procesosPorOrganizacion = procesos.filter(p => p.organizacion === organizacionSeleccionada?.nombre);
-  const campañasPorProceso = campañas.filter(c => 
-    c.proceso === procesoSeleccionado?.nombre &&
-    c.organizacion === organizacionSeleccionada?.nombre
-  );
-  
-  const candidatosFiltrados = candidatos.filter(c => c.organizacion === organizacionSeleccionada?.nombre && c.proceso === procesoSeleccionado?.nombre);
-  return (
-    <div>
-      <h1>Panel de Votantes</h1>
+  const campañasPorOrganizacion = campañasValidas.filter(c => c.organizacion === organizacionSeleccionada?.nombre);
+  const campañasPorProceso = campañas.filter(c => c.proceso === procesoSeleccionado?.nombre && c.organizacion === organizacionSeleccionada?.nombre);
 
-      {!modoVotante && (
-      <div style={{fontFamily: 'Bebas Neue',fontSize: '1.5rem',  textAlign: 'center' }}>
-        <h2>Seleccione una organización para votar</h2>
-        <div style={{fontFamily: 'Bebas Neue',fontSize: '1.5rem', display: 'flex', justifyContent: 'center', gap: '2rem', flexWrap: 'wrap' }}>
-          {organizaciones
-          
-            .map((org, i) => (
-              <div
-                key={i}
-                style={{
-                  border: '2px solid black',
-                  padding: '1rem',
-                  borderRadius: '10px',
-                  width: '300px',
-                }}
-              >
-                <h3>{org.nombre}</h3>
-                <button
-                  onClick={() => {
-                    setOrganizacionSeleccionada(org);
-                    setProcesoSeleccionado(null);
-                  }}
-                  style={{
-                    fontFamily: 'Bebas Neue',
-                    fontSize: '1.5rem', 
-                    marginTop: '1rem',
-                    fontSize: '1.5rem',
-                    padding: '10px',
-                    borderRadius: '8px',
-                    backgroundColor: 'green',
-                    color: 'white',
-                    cursor: 'pointer',
-                    border: 'none',
-                  }}
-                >
-                  Votar aquí
-                </button>
-              </div>
-            ))}
-        </div>
-    
-        {/* BOTÓN CANCELAR */}
-        <div style={{ marginTop: '2rem' }}>
-          <button
-            onClick={() => {
-              setOrganizacionSeleccionada(null);
-              setProcesoSeleccionado(null);
-              setModoVotante(false);
-              onCancelar();
-            }}
-            style={{ fontFamily: 'Bebas Neue', fontSize: '35px', marginTop: '3rem', marginBottom: '2rem', borderRadius: '7px', cursor: 'pointer' }}
-          >
-            Cancelar
-          </button>
-        </div>
+  if (!votanteLogueado) {
+    return (
+      <div style={{ fontFamily: 'Bebas Neue', textAlign: 'center', marginTop: '5rem' }}>
+        <h1>No hay votante logueado</h1>
+        <button style={botonEstilo('gray')} onClick={onCancelar}>Volver</button>
       </div>
-    )}
+    );
+  }
 
-      {modoVotante && organizacionSeleccionada?.registroVotantes === 'manual' && (
-        <FormularioVotante
-          onRegistrar={(nuevoVotante) => {
-            const nuevasOrganizaciones = organizaciones.map((org) => {
-              if (org.nombre === organizacionSeleccionada.nombre) {
-                return {
-                  ...org,
-                  votantes: [...org.votantes, nuevoVotante],
-                };
-              }
-              return org;
-            });
-            
-            setorganizaciones(nuevasOrganizaciones);
-            // ACTUALIZAR la organización seleccionada también
-            const nuevaOrg = nuevasOrganizaciones.find(org => org.nombre === organizacionSeleccionada.nombre);
-            setOrganizacionSeleccionada(nuevaOrg);
-            setVotanteLogueado(nuevoVotante);
-          }}
-          votantes={organizacionSeleccionada?.votantes || []}
-          onCancelar={() => {
-            setModoVotante(false);
-            setOrganizacionSeleccionada(null);
-            setProcesoSeleccionado(null);
-          }}
-        />
-      )}
-      {organizacionSeleccionada && !modoVotante && (
-  <div style={{ fontFamily: 'Bebas Neue',fontSize: '1.5rem', textAlign: 'center', marginTop: '2rem' }}>
-    <h2>Seleccione un proceso de {organizacionSeleccionada.nombre}</h2>
-    <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem', flexWrap: 'wrap' }}>
-      {procesosPorOrganizacion.map((proceso, i) => (
-        <div
-          key={i}
-          style={{
-            border: '2px solid #333',
-            padding: '1rem',
-            borderRadius: '10px',
-            width: '300px',
-            backgroundColor: '#f5f5f5',
-          }}
-        >
-          <h3>{proceso.nombre}</h3>
-          <button
-            onClick={() => {
-              setProcesoSeleccionado(proceso);
-              setModoVotante(true);
-            }}
-            style={{
-              fontFamily: 'Bebas Neue',
-              fontSize: '1.5rem', 
-              marginTop: '1rem',
-              fontSize: '1.2rem',
-              padding: '10px',
-              borderRadius: '8px',
-              backgroundColor: 'blue',
-              color: 'white',
-              cursor: 'pointer',
-              border: 'none',
-            }}
-          >
-            Seleccionar proceso
-          </button>
+  if (!modo) {
+    return (
+      <div style={{ fontFamily: 'Bebas Neue', textAlign: 'center', marginTop: '5rem' }}>
+        <h1>Bienvenido, {votanteLogueado.nombre} {votanteLogueado.apellido}</h1>
+        <button style={botonEstilo('blue')} onClick={() => setModo('ver')}>Ver campañas</button>
+        <button style={botonEstilo('green')} onClick={() => setModo('votar')}>Votar</button>
+        <button style={botonEstilo('red')} onClick={onCancelar}>Cerrar sesión</button>
+      </div>
+    );
+  }
+
+  if (modo === 'ver') {
+    if (!organizacionSeleccionada) {
+      return (
+        <div style={{ fontFamily: 'Bebas Neue', padding: '2rem', textAlign: 'center' }}>
+          <h2>Seleccione una organización</h2>
+          {organizacionesConCampañas.map((org, i) => (
+            <button
+              key={i}
+              style={botonEstilo('blue')}
+              onClick={() => setOrganizacionSeleccionada(org)}
+            >
+              {org.nombre}
+            </button>
+          ))}
+          <button style={botonEstilo('gray')} onClick={() => setModo(null)}>Volver</button>
         </div>
-      ))}
-    </div>
-  </div>
-)}
-      {modoVotante && organizacionSeleccionada?.registroVotantes === 'automatica' && !votanteLogueado && (
-        <div style={{fontFamily: 'Bebas Neue',textAlign: 'center', marginTop: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-
-          <h2>Iniciar sesión para votar</h2>
-          <input
-            placeholder="Cédula"
-            value={cedulaLogin}
-            onChange={(e) => setCedulaLogin(e.target.value)}
-            style={{ fontFamily: 'Bebas Neue',fontSize: '1.5rem', marginBottom: '1rem', padding: '10px', borderRadius: '8px', width: '300px' }}
-          /><br />
-          <input
-            placeholder="Código de Verificación"
-            value={codigoLogin}
-            onChange={(e) => setCodigoLogin(e.target.value)}
-            style={{ fontFamily: 'Bebas Neue',fontSize: '1.5rem', marginBottom: '1rem', padding: '10px', borderRadius: '8px', width: '300px' }}
-          /><br />
-          <button
-            onClick={() => {
-              const organizacion = organizaciones.find(org => org.nombre === organizacionSeleccionada.nombre);
-              const votanteEncontrado = organizacion.votantes.find(
-                (v) => v.cedula.toString() === cedulaLogin.trim() && v.codigo.toString() === codigoLogin.trim()
-              );
-              if (votanteEncontrado) {
-                setVotanteLogueado(votanteEncontrado);
-                setCedulaLogin('');
-                setCodigoLogin('');
-                alert('Ingreso exitoso. Ahora puede votar.');
-              } else {
-                alert('Cédula o código incorrecto.');
-              }
-            }}
-            style={botonEstilo('blue')}
-          >
-            Ingresar y Votar
-          </button>
-          <button
-            onClick={() => {
-              setModoVotante(false);
-              setOrganizacionSeleccionada(null);
-              setProcesoSeleccionado(null);
-            }}
-            style={botonEstilo('red')}
-          >
-            Cancelar
-          </button>
+      );
+    } else {
+      return (
+        <div style={{ fontFamily: 'Bebas Neue', padding: '2rem', textAlign: 'center' }}>
+          <h2>Campañas de {organizacionSeleccionada.nombre}</h2>
+          {campañasPorOrganizacion.map((campaña, i) => (
+            <div key={i} style={{ border: '1px solid gray', borderRadius: '10px', padding: '1rem', marginBottom: '1rem' }}>
+              <h3>{campaña.nombre}</h3>
+              <p><strong>Organización:</strong> {campaña.organizacion}</p>
+              <p><strong>Proceso:</strong> {campaña.proceso}</p>
+              <h4>Miembros:</h4>
+              <ul style={{ listStyle: 'none', padding: 0 }}>
+                {campaña.miembros.map((m, j) => {
+                  const datosCandidato = candidatos.find(c => c.correo === m.correo);
+                  return (
+                    <li key={j}>
+                      {m.puesto}: {m.nombre} ({m.correo})<br />
+                      {datosCandidato && (
+                        <>
+                          <strong>Plan:</strong> {datosCandidato.plan}<br />
+                          <strong>Ideas:</strong> {datosCandidato.ideas}
+                        </>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          ))}
+          <button style={botonEstilo('gray')} onClick={() => setOrganizacionSeleccionada(null)}>Volver</button>
         </div>
-      )}
+      );
+    }
+  }
 
-      {modoVotante && votanteLogueado && (
-        <div style={{ textAlign: 'center', marginTop: '2rem' }}>
-          <h2>Seleccione una campaña {votanteLogueado.nombre} </h2>
-          <div>
-            {campañasPorProceso.map((campaña, i) => (
-              <button
-                key={i}
-                onClick={() => {
-                  const candidatosCampaña = candidatosFiltrados.filter(c => c.campaña === campaña.nombre);
-                  const yaVoto = votos.some(v => v.cedula === votanteLogueado.cedula);
-                  if (yaVoto) {
-                    alert('Ya ha votado.');
-                    return;
-                  }
-                  const confirmar = window.confirm(`¿Confirma su voto para la campaña "${campaña.nombre}"?`);
-                  if (confirmar) {
-                    setVotos([...votos, {
-                      cedula: votanteLogueado.cedula,
-                      campaña: campaña.nombre
-                    }]);
-                    // Sumar voto a la campaña
-                    const nuevasCampañas = campañas.map((c) =>
-                      c.nombre === campaña.nombre
-                        ? { ...c, votos: (c.votos || 0) + 1 }
-                        : c
-                    );
-                    setCampañas(nuevasCampañas);
-
-                    // Confirmación y reset
-                    alert(`Voto registrado para la campaña "${campaña.nombre}"`);
-                    setModoVotante(false);
-                    setOrganizacionSeleccionada(null);
-                    setProcesoSeleccionado(null);
-                    setVotanteLogueado(null);
-                  }
-                }}
-                style={{
-                  fontSize: '1.3rem',
-                  padding: '10px 20px',
-                  borderRadius: '8px',
-                  backgroundColor: 'orange',
-                  color: 'white',
-                  cursor: 'pointer',
-                  border: 'none'
-                }}
-              >
-                Votar en campaña: {campaña.nombre}    
+  if (modo === 'votar') {
+    if (!organizacionSeleccionada) {
+      return (
+        <div style={{ fontFamily: 'Bebas Neue', textAlign: 'center', marginTop: '2rem' }}>
+          <h2>Seleccione una organización</h2>
+          <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+            {organizacionesConCampañas.map((org, i) => (
+              <button key={i} onClick={() => setOrganizacionSeleccionada(org)} style={botonEstilo('blue')}>
+                {org.nombre}
               </button>
             ))}
           </div>
+          <button style={botonEstilo('gray')} onClick={() => setModo(null)}>Volver</button>
         </div>
-      )}
-    </div>
-  );
+      );
+    }
+
+    if (!organizacionSeleccionada.votantes.some(v => v.cedula === votanteLogueado.cedula) && organizacionSeleccionada.registroVotantes === 'automatica') {
+      return (
+        <div style={{ fontFamily: 'Bebas Neue', textAlign: 'center', marginTop: '2rem' }}>
+          <h2>No estás habilitado para votar en esta organización.</h2>
+          <button style={botonEstilo('gray')} onClick={() => setOrganizacionSeleccionada(null)}>Volver</button>
+        </div>
+      );
+    }
+
+    const yaVotoEnOrganizacion = (votanteLogueado.votosEmitidos || []).some(nombreCampaña => {
+      const camp = campañas.find(c => c.nombre === nombreCampaña);
+      return camp && camp.organizacion === organizacionSeleccionada.nombre;
+    });
+
+    if (yaVotoEnOrganizacion) {
+      return (
+        <div style={{ fontFamily: 'Bebas Neue', textAlign: 'center', marginTop: '2rem' }}>
+          <h2>Ya has votado en una campaña de esta organización.</h2>
+          <button style={botonEstilo('gray')} onClick={() => setOrganizacionSeleccionada(null)}>Volver</button>
+        </div>
+      );
+    }
+
+    if (!procesoSeleccionado) {
+      return (
+        <div style={{ fontFamily: 'Bebas Neue', textAlign: 'center', marginTop: '2rem' }}>
+          <h2>Seleccione un proceso en {organizacionSeleccionada.nombre}</h2>
+          <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+            {procesosPorOrganizacion.map((p, i) => (
+              <button key={i} onClick={() => setProcesoSeleccionado(p)} style={botonEstilo('orange')}>
+                {p.nombre}
+              </button>
+            ))}
+          </div>
+          <button style={botonEstilo('gray')} onClick={() => setOrganizacionSeleccionada(null)}>Volver</button>
+        </div>
+      );
+    }
+
+    return (
+      <div style={{ fontFamily: 'Bebas Neue', textAlign: 'center', marginTop: '2rem' }}>
+        <h2>Seleccione una campaña</h2>
+        {campañasPorProceso.map((campaña, i) => (
+          <button
+            key={i}
+            style={{ ...botonEstilo('green'), marginBottom: '1rem' }}
+            onClick={() => {
+              const yaVoto = (votanteLogueado.votosEmitidos || []).includes(campaña.nombre);
+              if (yaVoto) return alert('Ya has votado en esta campaña.');
+
+              if (window.confirm(`¿Confirmás tu voto para la campaña "${campaña.nombre}"?`)) {
+                const actualizados = {
+                  ...votanteLogueado,
+                  votosEmitidos: [...(votanteLogueado.votosEmitidos || []), campaña.nombre]
+                };
+                setVotanteLogueado(actualizados);
+                setVotantes(prev =>
+                  prev.map(v => v.cedula === actualizados.cedula ? actualizados : v)
+                );
+
+                const nuevasCampañas = campañas.map(c =>
+                  c.nombre === campaña.nombre ? { ...c, votos: (c.votos || 0) + 1 } : c
+                );
+                setCampañas(nuevasCampañas);
+                alert('Voto registrado con éxito.');
+                setModo(null);
+                setOrganizacionSeleccionada(null);
+                setProcesoSeleccionado(null);
+              }
+            }}
+          >
+            Votar en "{campaña.nombre}"
+          </button>
+        ))}
+        <button style={botonEstilo('gray')} onClick={() => setProcesoSeleccionado(null)}>Volver</button>
+      </div>
+    );
+  }
+
+  return null;
 }
+
 const botonEstilo = (color) => ({
   fontFamily: 'Bebas Neue',
   margin: '1rem',
   padding: '1rem 2rem',
-  fontSize: '2rem',
+  fontSize: '1.5rem',
   backgroundColor: color,
   color: 'white',
   borderRadius: '10px',
   border: 'none',
   cursor: 'pointer'
 });
-const inputStyle = {
-  fontFamily: 'Bebas Neue',
-  fontSize: '1.5rem',
-  marginBottom: '1rem',
-  padding: '10px',
-  borderRadius: '8px',
-  width: '300px'
-};
 
 export default VotantesPanel;

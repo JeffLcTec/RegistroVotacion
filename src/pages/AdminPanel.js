@@ -6,10 +6,6 @@ import FormularioOrganizacion from '../FormularioOrganizacion';
 import EditarVotantesOrganizacion from '../EditarVotantesOrganizacion';
 import FormularioProcesoVotacion from '../FormularioProcesoVotacion';
 
-
-/*$env:NODE_OPTIONS="--openssl-legacy-provider"*/
-
-
 function AdminPanel({
   onCerrarSesion,
   organizaciones,
@@ -20,6 +16,9 @@ function AdminPanel({
   setVotantes,
   procesos,
   setProcesos,
+  procesosFinalizados,
+  setProcesosFinalizados,
+  finalizarProceso,
   campañas,
   setCampañas
 }) {
@@ -394,7 +393,7 @@ const registrarCandidato = (nuevoCandidato) => {
               </h3>
               <ul style={{ listStyle: 'none', padding: 0, marginTop: '1rem' }}>
               {organizaciones
-                .filter((org) => org.registroVotantes === 'automatica')
+                .filter((org) => org.registroVotantes === 'privada')
                 .map((org, i) => (
                   <li key={i} style={{ marginBottom: '0.5rem' }}>
                     <button
@@ -523,6 +522,20 @@ const registrarCandidato = (nuevoCandidato) => {
                   </li>
                 ))}
             </ul>
+            <button
+            onClick={() => finalizarProceso(p.nombre)}
+            style={{
+              marginTop: '0.8rem',
+              backgroundColor: 'crimson',
+              color: 'white',
+              border: 'none',
+              padding: '0.5rem 1rem',
+              borderRadius: '8px',
+              cursor: 'pointer'
+            }}
+          >
+            Finalizar Proceso
+          </button>
           </li>
         ))}
       </ul>

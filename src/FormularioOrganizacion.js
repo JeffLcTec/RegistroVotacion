@@ -7,7 +7,7 @@ export default function FormularioOrganizacion({ onRegistrar, organizaciones, on
   const [formData, setFormData] = useState({
     nombre: '',
     tipo: '',
-    registroVotantes: 'manual', // 'manual' o 'automatica'
+    registroVotantes: 'publica', // 'publica' o 'privada'
     votantes: [] 
   });
 
@@ -59,17 +59,17 @@ export default function FormularioOrganizacion({ onRegistrar, organizaciones, on
       votantes: votantesFinales // <--- Aquí agregamos la lista de votantes a la organización
     };
     onRegistrar(organizacionConVotantes);
-    setFormData({ nombre: '', tipo: '', registroVotantes: 'manual' });
+    setFormData({ nombre: '', tipo: '', registroVotantes: 'publica' });
     setVotantesFinales([]); 
   };
 
   // Lógica para el registro de votantes
   const registrarVotante = () => {
-    if (formData.registroVotantes === 'automatica') {
+    if (formData.registroVotantes === 'privada') {
       // Aquí puedes agregar la lógica de cómo se agregan los votantes automáticamente
       alert("Votante registrado automáticamente a la organización");
     } else {
-      // Para "manual", pedimos que se registre a mano
+      // Para "publica", pedimos que se registre a mano
       alert("Por favor, registra el votante manualmente");
     }
   };
@@ -95,32 +95,32 @@ export default function FormularioOrganizacion({ onRegistrar, organizaciones, on
 
       <div style={{ textAlign: 'left', marginBottom: '1rem' }}>
         <p style={{ fontFamily: 'Bebas Neue', fontSize: '20px' }}>
-          ¿Cómo se registran los votantes?
+          Selecciona el tipo de organización
         </p>
         <label style={{ fontFamily: 'Bebas Neue', fontSize: '18px' }}>
           <input
             type="radio"
             name="registroVotantes"
-            value="manual"
-            checked={formData.registroVotantes === 'manual'}
+            value="publica"
+            checked={formData.registroVotantes === 'publica'}
             onChange={handleChange}
           />
-          Los votantes se registran por su cuenta
+          Organización publica
         </label>
         <br />
         <label style={{ fontFamily: 'Bebas Neue', fontSize: '18px' }}>
           <input
             type="radio"
             name="registroVotantes"
-            value="automatica"
-            checked={formData.registroVotantes === 'automatica'}
+            value="privada"
+            checked={formData.registroVotantes === 'privada'}
             onChange={handleChange}
           />
-          La organización registra a los votantes manualmente
+          Organización Privada
         </label>
 
       </div>
-      {formData.registroVotantes === 'automatica'  && (
+      {formData.registroVotantes === 'privada'  && (
   <FormularioRegistrarVotantesOrg
     onRegistrar={manejarRegistroVotantes}
     onCancelar={() => setMostrarFormularioVotantes(false)}

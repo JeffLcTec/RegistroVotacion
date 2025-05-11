@@ -1,42 +1,17 @@
 import React, { useState } from 'react';
 
-export default function EditarVotantesOrganizacion({ organizacion, onGuardar, onCancelar }) {
+function EditarVotantesOrganizacion({ organizacion, onGuardar, onCancelar }) {
   const [votantes, setVotantes] = useState(organizacion.votantes || []);
-
-  const inputStyle = {
-    fontFamily: 'Bebas Neue',
-    width: '100%',
-    padding: '12px',
-    fontSize: '20px',
-    marginBottom: '10px',
-    borderRadius: '6px',
-    border: '1px solid #ccc'
-  };
-
-  const [nuevoVotante, setNuevoVotante] = useState({
-    nombre: '',
-    cedula: ''
-  });
-
-  const generarCodigoUnico = () => {
-    let codigo;
-    let existe;
-    do {
-      codigo = Math.floor(10000 + Math.random() * 90000).toString(); // 🔥 Código aleatorio de 5 dígitos
-      existe = votantes.some(v => v.codigo === codigo);
-    } while (existe);
-    return codigo;
-  };
+  const [nuevaCedula, setNuevaCedula] = useState('');
 
   const agregarVotante = () => {
-    if (!nuevoVotante.nombre.trim() || !nuevoVotante.cedula.trim()) {
-      alert('Por favor complete todos los campos del votante.');
+    if (!nuevaCedula.trim()) {
+      alert('Debe ingresar una cédula.');
       return;
     }
-    const nuevoCodigo = generarCodigoUnico();
-    const nuevo = { ...nuevoVotante, codigo: nuevoCodigo };
+    const nuevo = { cedula: nuevaCedula.trim() };
     setVotantes([...votantes, nuevo]);
-    setNuevoVotante({ nombre: '', cedula: '' });
+    setNuevaCedula('');
   };
 
   const eliminarVotante = (index) => {
@@ -45,70 +20,35 @@ export default function EditarVotantesOrganizacion({ organizacion, onGuardar, on
     setVotantes(nuevos);
   };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setNuevoVotante({ ...nuevoVotante, [name]: value });
-  };
-
   const guardarCambios = () => {
-    const organizacionActualizada = { ...organizacion, votantes };
-    onGuardar(organizacionActualizada);
+    const nuevaOrganizacion = { ...organizacion, votantes };
+    onGuardar(nuevaOrganizacion);
   };
 
   return (
-    <div style={{ textAlign: 'center', maxWidth: '700px', margin: 'auto' }}>
-      <h2 style={{ fontFamily: 'Bebas Neue', fontSize: '2.5rem' }}>
-        Editar Votantes de {organizacion.nombre}
-      </h2>
+    <div style={{ fontFamily: 'Bebas Neue', padding: '2rem' }}>
+      <h2>Editar Votantes - {organizacion.nombre}</h2>
 
-      <div style={{ marginBottom: '2rem' }}>
+      <div>
         <input
-          name="nombre"
-          placeholder="Nombre del votante"
-          value={nuevoVotante.nombre}
-          onChange={handleChange}
-          style={inputStyle}
-        />
-        <input
-          name="cedula"
+          type="text"
           placeholder="Cédula"
-          value={nuevoVotante.cedula}
-          onChange={handleChange}
-          style={inputStyle}
+          value={nuevaCedula}
+          onChange={(e) => setNuevaCedula(e.target.value)}
+          style={{ margin: '0.5rem', fontSize: '18px' }}
         />
-        <button
-          type="button"
-          onClick={agregarVotante}
-          style={{
-            fontFamily: 'Bebas Neue',
-            fontSize: '20px',
-            margin: '1rem',
-            borderRadius: '7px',
-            padding: '10px 20px',
-            cursor: 'pointer'
-          }}
-        >
+        <button onClick={agregarVotante} style={{ fontSize: '16px' }}>
           Agregar Votante
         </button>
       </div>
 
-      <h3 style={{ fontFamily: 'Bebas Neue', fontSize: '2rem' }}>Lista de Votantes Registrados</h3>
-      <ul style={{ listStyle: 'none', padding: 0 }}>
+      <ul style={{ fontSize: '20px' }}>
         {votantes.map((v, i) => (
-          <li key={i} style={{ marginBottom: '0.7rem', fontFamily: 'Bebas Neue', fontSize: '20px' }}>
-            {v.nombre} - Cédula: {v.cedula} - Código: {v.codigo}
+          <li key={i}>
+            Cédula: {v.cedula}
             <button
               onClick={() => eliminarVotante(i)}
-              style={{
-                marginLeft: '10px',
-                padding: '4px 10px',
-                fontFamily: 'Bebas Neue',
-                backgroundColor: 'red',
-                color: 'white',
-                border: 'none',
-                borderRadius: '5px',
-                cursor: 'pointer'
-              }}
+              style={{ marginLeft: '1rem', fontSize: '16px' }}
             >
               Eliminar
             </button>
@@ -116,33 +56,14 @@ export default function EditarVotantesOrganizacion({ organizacion, onGuardar, on
         ))}
       </ul>
 
-      <div style={{ marginTop: '2rem' }}>
-        <button
-          onClick={guardarCambios}
-          style={{
-            fontFamily: 'Bebas Neue',
-            fontSize: '25px',
-            margin: '1rem',
-            borderRadius: '7px',
-            padding: '10px 20px'
-          }}
-        >
-          Guardar Cambios
-        </button>
-
-        <button
-          onClick={onCancelar}
-          style={{
-            fontFamily: 'Bebas Neue',
-            fontSize: '22px',
-            margin: '1rem',
-            borderRadius: '7px',
-            padding: '10px 20px'
-          }}
-        >
-          Cancelar
-        </button>
-      </div>
+      <button onClick={guardarCambios} style={{ fontSize: '18px', marginTop: '1rem' }}>
+        Guardar Cambios
+      </button>
+      <button onClick={onCancelar} style={{ fontSize: '18px', marginLeft: '1rem' }}>
+        Cancelar
+      </button>
     </div>
   );
 }
+
+export default EditarVotantesOrganizacion;

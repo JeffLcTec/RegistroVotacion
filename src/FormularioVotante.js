@@ -1,14 +1,15 @@
+// FormularioVotante.js actualizado para incluir correo y contraseña
 import React from 'react';
 import { useState } from 'react';
 
-export default function FormularioVotante({ onRegistrar, votantes, onCancelar, candidatos }) {
+export default function FormularioVotante({ onRegistrar, votantes, onCancelar }) {
   const [formData, setFormData] = useState({
     nombre: '',
     apellido: '',
-    cedula: ''
+    cedula: '',
+    correo: '',
+    contraseña: ''
   });
-
-  console.log("FormularioVotante renderizado")
 
   const inputStyle = {
     fontFamily: 'Bebas Neue',
@@ -33,11 +34,10 @@ export default function FormularioVotante({ onRegistrar, votantes, onCancelar, c
       return;
     }
 
-    // Verificar que la cédula tenga formato válido
     const cedulaValida = /^[1-7]0\d{3}0\d{3}$/.test(formData.cedula);
     if (!cedulaValida) {
-    alert('La cédula no tiene un formato válido. ej. 101110111');
-    return;
+      alert('La cédula no tiene un formato válido. ej. 101110111');
+      return;
     }
 
     const duplicado = votantes.some((v) => v.cedula === formData.cedula);
@@ -46,17 +46,13 @@ export default function FormularioVotante({ onRegistrar, votantes, onCancelar, c
       return;
     }
 
-    console.log("Intentando registrar:", formData);
-
     onRegistrar(formData);
 
-    setFormData({ nombre: '', apellido: '', cedula: '' });
+    setFormData({ nombre: '', apellido: '', cedula: '', correo: '', contraseña: '' });
   };
 
   return (
-     
     <form onSubmit={handleSubmit} style={{ textAlign: 'center', maxWidth: '600px', margin: 'auto' }}>
-      
       <h2>Formulario Votante</h2>
 
       <input
@@ -80,6 +76,21 @@ export default function FormularioVotante({ onRegistrar, votantes, onCancelar, c
         onChange={handleChange}
         style={inputStyle}
         maxLength={9}
+      />
+      <input
+        name="correo"
+        placeholder="Correo Electrónico"
+        value={formData.correo}
+        onChange={handleChange}
+        style={inputStyle}
+      />
+      <input
+        name="contraseña"
+        placeholder="Contraseña"
+        type="password"
+        value={formData.contraseña}
+        onChange={handleChange}
+        style={inputStyle}
       />
 
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0px', marginTop: '1rem' }}>
