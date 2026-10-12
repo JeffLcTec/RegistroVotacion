@@ -1,3 +1,21 @@
+# RegistroVotacion
+
+Voting registration web app built with React.
+
+**Live demo:** https://registro-votacion.vercel.app
+
+## Tech
+
+React · React Router · Create React App · Deployed on Vercel
+
+## Run it locally
+
+```bash
+npm install
+npm start
+```
+
+The start script sets `NODE_OPTIONS=--openssl-legacy-provider` for compatibility with react-scripts on recent Node versions.
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
